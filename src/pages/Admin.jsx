@@ -399,6 +399,65 @@ function GitHubSettings({ token, onSave, onClose }) {
   );
 }
 
+// ─── Logo uploader ────────────────────────────────────────────────────────────
+function LogoUploader({ token }) {
+  const fileRef = useRef();
+  const [state, setState] = useState('idle'); // idle | uploading | done | error
+  const [errMsg, setErrMsg] = useState('');
+  const [preview, setPreview] = useState(null);
+
+  async function handleFile(e) {
+    const file = e.target.files[0];
+    if (!file || !file.type.startsWith('image/')) return;
+
+    // Always show local preview immediately
+    const localUrl = URL.createObjectURL(file);
+    setPreview(localUrl);
+
+    if (!token) { setErrMsg('No GitHub token — connect one to push the logo.'); setState('error'); return; }
+
+    setState('uploading'); setErrMsg('');
+    try {
+      // Force filename to logo.png regardless of what user uploaded
+      const renamed = new File([file], 'logo.png', { type: file.type });
+      await uploadToGitHub(renamed, token);
+      setState('done'); setTimeout(() => setState('idle'), 4000);
+    } catch (err) {
+      setErrMsg(err.message); setState('error');
+    }
+  }
+
+  const logoSrc = preview || `${import.meta.env.BASE_URL}images/logo.png`;
+
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Site Logo</label>
+      <div
+        onClick={() => fileRef.current.click()}
+        className="relative cursor-pointer flex items-center gap-4 p-3 rounded-xl border border-dashed border-white/15
+          hover:border-white/30 transition-colors group"
+      >
+        <div className="w-28 h-14 rounded-lg bg-[#0a0e1a] border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
+          <img src={logoSrc} alt="Logo" className="max-w-full max-h-full object-contain p-1"
+            onError={e => { e.target.style.display = 'none'; }} />
+        </div>
+        <div>
+          <div className="text-sm text-gray-300 group-hover:text-white transition-colors font-medium flex items-center gap-2">
+            <Upload size={13} /> Replace logo
+          </div>
+          <div className="text-xs text-gray-600 mt-0.5">
+            {token ? 'Pushed to GitHub automatically' : 'Connect GitHub token to auto-push'}
+          </div>
+        </div>
+      </div>
+      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+      {state === 'uploading' && <p className="text-blue-400 text-xs flex items-center gap-1 mt-1"><Loader2 size={11} className="animate-spin" /> Uploading…</p>}
+      {state === 'done'     && <p className="text-green-400 text-xs flex items-center gap-1 mt-1"><Check size={11} /> Logo pushed — site redeploying.</p>}
+      {state === 'error'    && <p className="text-red-400 text-xs mt-1">{errMsg}</p>}
+    </div>
+  );
+}
+
 // ─── Image upload button ──────────────────────────────────────────────────────
 function ImageUploader({ token, currentImage, onUploaded }) {
   const fileRef  = useRef();
@@ -637,6 +696,12 @@ export default function Admin() {
             </span>
           </div>
         )}
+
+        {/* Site Settings */}
+        <div className="mb-6 p-4 rounded-2xl bg-white/3 border border-white/8">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Site Settings</p>
+          <LogoUploader token={ghToken} />
+        </div>
 
         <div className="space-y-2">
           {deckList.map((deck, idx) => (
