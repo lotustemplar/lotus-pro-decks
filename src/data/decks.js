@@ -254,7 +254,8 @@ export const colorMeta = {
   black: { label: "Black",      hex: "#7c3aed", icon: "💀", desc: "Sacrifice & Drain",  glowClass: "glow-purple" },
   white: { label: "White",      hex: "#f59e0b", icon: "☀️", desc: "Lifegain & Tokens",  glowClass: "glow-gold" },
   green: { label: "Green",      hex: "#22c55e", icon: "🌿", desc: "Ramp & Creatures",   glowClass: "glow-green" },
-  multi: { label: "Multicolor", hex: "#ec4899", icon: "✨", desc: "All Combinations",   glowClass: "glow-pink" },
+  multi:     { label: "Multicolor", hex: "#ec4899", icon: "✨", desc: "All Combinations",    glowClass: "glow-pink" },
+  colorless: { label: "Colorless",  hex: "#9ca3af", icon: "◇",  desc: "Eldrazi & Artifacts", glowClass: "glow-gray" },
 };
 
 export const playstyleMeta = [

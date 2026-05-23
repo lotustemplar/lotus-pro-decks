@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { colorMeta } from '../data/decks';
 
-const COLOR_KEYS = ['red', 'blue', 'black', 'white', 'green', 'multi'];
+const COLOR_KEYS = ['red', 'blue', 'black', 'white', 'green', 'multi', 'colorless'];
 
 const COLOR_ICONS = {
   red: (
@@ -53,6 +53,14 @@ const COLOR_ICONS = {
         </linearGradient>
       </defs>
       <path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z" fill="url(#multiGrad)"/>
+    </svg>
+  ),
+  colorless: (
+    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+      {/* Grey diamond — MTG colorless symbol */}
+      <path d="M12 2L22 12L12 22L2 12Z" fill="currentColor" opacity="0.85"/>
+      <path d="M12 6L18 12L12 18L6 12Z" fill="white" opacity="0.2"/>
+      <path d="M12 2L22 12L12 22" stroke="white" strokeWidth="0.5" strokeOpacity="0.3" fill="none"/>
     </svg>
   ),
 };

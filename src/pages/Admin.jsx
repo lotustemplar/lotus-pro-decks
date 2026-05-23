@@ -23,19 +23,21 @@ const COLOR_PRESETS = {
   'red,white':  { accentColor: '#f87171', gradientFrom: '#1a0000', gradientTo: '#1a1400', glowClass: 'glow-red' },
   'green,red':  { accentColor: '#f97316', gradientFrom: '#1a0000', gradientTo: '#001a00', glowClass: 'glow-red' },
   'black,blue': { accentColor: '#818cf8', gradientFrom: '#00001a', gradientTo: '#0d0020', glowClass: 'glow-blue' },
+  'colorless':  { accentColor: '#9ca3af', gradientFrom: '#1a1a1a', gradientTo: '#0d0d0d', glowClass: 'glow-gray' },
 };
 const COLOR_LABELS = {
   red: 'Mono Red', blue: 'Mono Blue', black: 'Mono Black', white: 'Mono White', green: 'Mono Green',
   'black,white': 'White / Black', 'black,green': 'Black / Green', 'black,red': 'Black / Red',
   'blue,red': 'Blue / Red', 'blue,white': 'Blue / White', 'green,white': 'Green / White',
-  'blue,green': 'Simic', 'red,white': 'Red / White', 'green,red': 'Gruul', 'black,blue': 'Dimir',
+  'blue,green': 'Simic', 'red,white': 'Red / White', 'green,red': 'Gruul', 'black,blue': 'Dimir', 'colorless': 'Colorless',
 };
 const MTG_COLORS = [
-  { key: 'white', symbol: 'W', hex: '#f59e0b' },
-  { key: 'blue',  symbol: 'U', hex: '#3b82f6' },
-  { key: 'black', symbol: 'B', hex: '#7c3aed' },
-  { key: 'red',   symbol: 'R', hex: '#ef4444' },
-  { key: 'green', symbol: 'G', hex: '#22c55e' },
+  { key: 'white',     symbol: 'W', hex: '#f59e0b' },
+  { key: 'blue',      symbol: 'U', hex: '#3b82f6' },
+  { key: 'black',     symbol: 'B', hex: '#7c3aed' },
+  { key: 'red',       symbol: 'R', hex: '#ef4444' },
+  { key: 'green',     symbol: 'G', hex: '#22c55e' },
+  { key: 'colorless', symbol: '◇', hex: '#9ca3af' },
 ];
 const DIFFICULTY_OPTIONS = ['Beginner', 'Intermediate', 'Advanced'];
 const REPO_OWNER = 'lotustemplar';
@@ -44,6 +46,7 @@ const REPO_NAME  = 'propilot-decks';
 function colorKey(c) { return [...c].sort().join(','); }
 function deriveColorMeta(colors) {
   if (!colors.length) return { accentColor: '#6366f1', gradientFrom: '#0a0a1a', gradientTo: '#1a0a1a', glowClass: 'glow-purple', colorLabel: 'Colorless' };
+  if (colors.length === 1 && colors[0] === 'colorless') return { accentColor: '#9ca3af', gradientFrom: '#1a1a1a', gradientTo: '#0d0d0d', glowClass: 'glow-gray', colorLabel: 'Colorless' };
   if (colors.length >= 3) return { accentColor: '#ec4899', gradientFrom: '#1a001a', gradientTo: '#001a1a', glowClass: 'glow-pink', colorLabel: 'Multicolor' };
   const key = colorKey(colors);
   const preset = COLOR_PRESETS[key] || COLOR_PRESETS[colors[0]] || COLOR_PRESETS.black;
