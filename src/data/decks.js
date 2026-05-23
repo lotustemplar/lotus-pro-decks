@@ -109,7 +109,7 @@ export const decks = [
     id: 4,
     name: "Krenko Goblin Blitz",
     commander: "Krenko, Mob Boss",
-    price: 129,
+    price: 79,
     bracket: 2,
     colors: ["red"],
     colorLabel: "Mono Red",
@@ -139,7 +139,7 @@ export const decks = [
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Goblin reference card", "Synergy cheat sheet", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
-    quantity: 10,
+    quantity: 1,
   },
   {
     id: 5,
