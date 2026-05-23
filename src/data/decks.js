@@ -109,7 +109,7 @@ export const decks = [
     id: 4,
     name: "Krenko Goblin Blitz",
     commander: "Krenko, Mob Boss",
-    price: 79,
+    price: 77,
     bracket: 2,
     colors: ["red"],
     colorLabel: "Mono Red",
