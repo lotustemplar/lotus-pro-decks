@@ -61,10 +61,25 @@ async function sha256(text) {
 // ─── GitHub helpers ───────────────────────────────────────────────────────────
 function ghHeaders(token) {
   return {
-    Authorization: `token ${token}`,
+    Authorization: `Bearer ${token}`,
     Accept: 'application/vnd.github.v3+json',
     'Content-Type': 'application/json',
   };
+}
+
+async function testGitHubToken(token) {
+  const res = await fetch(
+    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}`,
+    { headers: ghHeaders(token) }
+  );
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || `HTTP ${res.status}`);
+  }
+  const j = await res.json();
+  // Verify we have push access
+  if (!j.permissions?.push) throw new Error('Token is read-only — enable Contents: Write');
+  return true;
 }
 
 async function ghPut(path, content, message, token) {
@@ -303,8 +318,25 @@ function LoginGate({ onAuth }) {
 
 // ─── GitHub settings panel ────────────────────────────────────────────────────
 function GitHubSettings({ token, onSave, onClose }) {
-  const [val, setVal] = useState(token || '');
-  const [show, setShow] = useState(false);
+  const [val, setVal]         = useState(token || '');
+  const [show, setShow]       = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testMsg, setTestMsg] = useState('');  // '' | 'ok' | error string
+
+  async function handleTest() {
+    const t = val.trim();
+    if (!t) { setTestMsg('Paste a token first.'); return; }
+    setTesting(true); setTestMsg('');
+    try {
+      await testGitHubToken(t);
+      setTestMsg('ok');
+    } catch (err) {
+      setTestMsg(err.message);
+    } finally {
+      setTesting(false);
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
@@ -316,13 +348,15 @@ function GitHubSettings({ token, onSave, onClose }) {
           <button onClick={onClose} className="ml-auto text-gray-500 hover:text-white transition-colors"><X size={16} /></button>
         </div>
         <p className="text-sm text-gray-400 mb-4 leading-relaxed">
-          A Personal Access Token lets the admin upload images directly to your GitHub repo.
-          Create one at <a href="https://github.com/settings/tokens" target="_blank" rel="noreferrer"
-            className="text-blue-400 underline">github.com/settings/tokens</a> with <code className="text-gray-300 bg-white/10 px-1 rounded">contents:write</code> permission.
+          Create a fine-grained token at{' '}
+          <a href="https://github.com/settings/tokens?type=fine-grained" target="_blank" rel="noreferrer"
+            className="text-blue-400 underline">github.com/settings/tokens</a>.
+          Set <strong className="text-gray-300">Repository access → Only select → propilot-decks</strong>,
+          then <strong className="text-gray-300">Permissions → Contents → Read and write</strong>.
         </p>
-        <div className="relative mb-4">
-          <input type={show ? 'text' : 'password'} value={val} onChange={e => setVal(e.target.value)}
-            placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+        <div className="relative mb-2">
+          <input type={show ? 'text' : 'password'} value={val} onChange={e => { setVal(e.target.value); setTestMsg(''); }}
+            placeholder="github_pat_… or ghp_…"
             className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 pr-10 text-white text-sm
               font-mono focus:outline-none focus:border-blue-500 transition-colors" />
           <button type="button" onClick={() => setShow(s => !s)}
@@ -330,7 +364,24 @@ function GitHubSettings({ token, onSave, onClose }) {
             {show ? <EyeOff size={14} /> : <Eye size={14} />}
           </button>
         </div>
-        <p className="text-xs text-gray-600 mb-5">Token is stored only in your browser — never sent anywhere except GitHub's API.</p>
+
+        {/* Test result */}
+        {testMsg === 'ok' && (
+          <p className="text-green-400 text-xs flex items-center gap-1 mb-3"><Check size={12} /> Connected — write access confirmed.</p>
+        )}
+        {testMsg && testMsg !== 'ok' && (
+          <p className="text-red-400 text-xs mb-3">✗ {testMsg}</p>
+        )}
+        {!testMsg && <p className="text-xs text-gray-600 mb-3">Token is stored only in your browser.</p>}
+
+        <div className="flex gap-2 mb-4">
+          <button onClick={handleTest} disabled={testing || !val.trim()}
+            className="flex-1 py-2 rounded-xl border border-white/10 text-gray-300 hover:text-white
+              text-sm transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
+            {testing ? <><Loader2 size={13} className="animate-spin" /> Testing…</> : 'Test Connection'}
+          </button>
+        </div>
+
         <div className="flex gap-3">
           <button onClick={() => { onSave(val.trim()); onClose(); }}
             className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors">
@@ -495,14 +546,20 @@ export default function Admin() {
     setDeckList(next);
     setSaved(true); setTimeout(() => setSaved(false), 2000);
 
+    console.log('[Admin] saveDeck — ghToken present:', !!ghToken, 'length:', ghToken?.length);
+
     if (ghToken) {
       setPushStatus('pushing'); setPushError('');
       try {
         await pushDecksJs(next, ghToken);
-        setPushStatus('done'); setTimeout(() => setPushStatus('idle'), 4000);
+        setPushStatus('done'); setTimeout(() => setPushStatus('idle'), 5000);
       } catch (err) {
+        console.error('[Admin] push failed:', err);
         setPushStatus('error'); setPushError(err.message);
       }
+    } else {
+      setPushStatus('error');
+      setPushError('No GitHub token — click the GitHub button and save your token first.');
     }
   }
   function addSection() { set('fullDecklist', [...editing.fullDecklist, { section: 'New Section', cards: [] }]); }
@@ -639,6 +696,38 @@ export default function Admin() {
     <div className="min-h-screen bg-[#0a0e1a] pt-20 pb-20">
       {showGhSettings && (
         <GitHubSettings token={ghToken} onSave={setGhToken} onClose={() => setShowGhSettings(false)} />
+      )}
+
+      {/* Fixed toast — always visible regardless of scroll */}
+      {(pushStatus === 'pushing' || pushStatus === 'done' || pushStatus === 'error') && (
+        <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full shadow-2xl">
+          {pushStatus === 'pushing' && (
+            <div className="flex items-center gap-3 p-4 rounded-2xl bg-[#0f1629] border border-blue-500/30 text-blue-300 text-sm">
+              <Loader2 size={16} className="animate-spin shrink-0" />
+              Pushing to GitHub — redeploying in ~60s…
+            </div>
+          )}
+          {pushStatus === 'done' && (
+            <div className="flex items-center gap-3 p-4 rounded-2xl bg-[#0f1629] border border-green-500/30 text-green-400 text-sm">
+              <Check size={16} className="shrink-0" />
+              Live! Site is rebuilding now.
+            </div>
+          )}
+          {pushStatus === 'error' && (
+            <div className="p-4 rounded-2xl bg-[#0f1629] border border-red-500/30 text-sm">
+              <div className="flex items-start gap-3">
+                <span className="text-red-400 mt-0.5 shrink-0">✗</span>
+                <div className="flex-1">
+                  <p className="text-red-400 font-semibold mb-0.5">Push failed</p>
+                  <p className="text-gray-400 text-xs leading-relaxed">{pushError}</p>
+                </div>
+                <button onClick={() => setPushStatus('idle')} className="text-gray-600 hover:text-white shrink-0">
+                  <X size={14} />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       )}
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Edit header */}
