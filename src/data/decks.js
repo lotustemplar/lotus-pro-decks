@@ -3,7 +3,7 @@ export const decks = [
     id: 1,
     name: "Meren Graveyard Engine",
     commander: "Meren of Clan Nel Toth",
-    price: 89,
+    price: 69,
     bracket: 2,
     colors: ["black","green"],
     colorLabel: "Black / Green",
