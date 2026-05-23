@@ -58,7 +58,27 @@ async function sha256(text) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// ─── GitHub image upload ──────────────────────────────────────────────────────
+// ─── GitHub helpers ───────────────────────────────────────────────────────────
+function ghHeaders(token) {
+  return {
+    Authorization: `token ${token}`,
+    Accept: 'application/vnd.github.v3+json',
+    'Content-Type': 'application/json',
+  };
+}
+
+async function ghPut(path, content, message, token) {
+  const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`;
+  const headers = ghHeaders(token);
+  let sha;
+  const check = await fetch(url, { headers });
+  if (check.ok) { const j = await check.json(); sha = j.sha; }
+  const body = { message, content, ...(sha ? { sha } : {}) };
+  const res = await fetch(url, { method: 'PUT', headers, body: JSON.stringify(body) });
+  if (!res.ok) { const err = await res.json(); throw new Error(err.message || 'GitHub API error'); }
+  return res.json();
+}
+
 async function uploadToGitHub(file, token) {
   const filename = file.name.toLowerCase().replace(/\s+/g, '-');
   const base64 = await new Promise((res, rej) => {
@@ -67,29 +87,13 @@ async function uploadToGitHub(file, token) {
     r.onerror = rej;
     r.readAsDataURL(file);
   });
-
-  const path = `public/images/${filename}`;
-  const apiBase = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`;
-  const headers = {
-    Authorization: `token ${token}`,
-    Accept: 'application/vnd.github.v3+json',
-    'Content-Type': 'application/json',
-  };
-
-  // Check if file exists (need SHA for updates)
-  let sha;
-  const check = await fetch(apiBase, { headers });
-  if (check.ok) { const j = await check.json(); sha = j.sha; }
-
-  const body = { message: `Add deck image: ${filename}`, content: base64 };
-  if (sha) body.sha = sha;
-
-  const res = await fetch(apiBase, { method: 'PUT', headers, body: JSON.stringify(body) });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || 'GitHub upload failed');
-  }
+  await ghPut(`public/images/${filename}`, base64, `Add deck image: ${filename}`, token);
   return filename;
+}
+
+async function pushDecksJs(deckList, token) {
+  const content = btoa(unescape(encodeURIComponent(generateDecksJs(deckList))));
+  await ghPut('src/data/decks.js', content, 'Update decks via admin panel', token);
 }
 
 // ─── Generate decks.js content ────────────────────────────────────────────────
@@ -449,6 +453,9 @@ export default function Admin() {
   const [activeTab, setActiveTab] = useState('basic');
   const [savedFlash, setSaved]    = useState(false);
   const [exportFlash, setExport]  = useState(false);
+  // push status: 'idle' | 'pushing' | 'done' | 'error'
+  const [pushStatus, setPushStatus] = useState('idle');
+  const [pushError,  setPushError]  = useState('');
 
   useEffect(() => { localStorage.setItem('adminDecks', JSON.stringify(deckList)); }, [deckList]);
   useEffect(() => { localStorage.setItem('admin_gh_token', ghToken); }, [ghToken]);
@@ -480,10 +487,23 @@ export default function Admin() {
   function toggleStyle(t) {
     set('playstyles', editing.playstyles.includes(t) ? editing.playstyles.filter(x => x !== t) : [...editing.playstyles, t]);
   }
-  function saveDeck() {
+  async function saveDeck() {
     const exists = deckList.some(d => d.id === editing.id);
-    setDeckList(p => exists ? p.map(d => d.id === editing.id ? editing : d) : [...p, editing]);
+    const next = exists
+      ? deckList.map(d => d.id === editing.id ? editing : d)
+      : [...deckList, editing];
+    setDeckList(next);
     setSaved(true); setTimeout(() => setSaved(false), 2000);
+
+    if (ghToken) {
+      setPushStatus('pushing'); setPushError('');
+      try {
+        await pushDecksJs(next, ghToken);
+        setPushStatus('done'); setTimeout(() => setPushStatus('idle'), 4000);
+      } catch (err) {
+        setPushStatus('error'); setPushError(err.message);
+      }
+    }
   }
   function addSection() { set('fullDecklist', [...editing.fullDecklist, { section: 'New Section', cards: [] }]); }
   function removeSection(i) { set('fullDecklist', editing.fullDecklist.filter((_, idx) => idx !== i)); }
@@ -546,9 +566,20 @@ export default function Admin() {
           </div>
         )}
 
-        <div className="mb-4 p-3 rounded-xl bg-blue-500/8 border border-blue-500/15 text-blue-300 text-sm">
-          <strong>Deploy:</strong> Edit → Save → <em>Download decks.js</em> → replace <code className="bg-black/30 px-1 rounded text-blue-200">src/data/decks.js</code> → <code className="bg-black/30 px-1 rounded text-blue-200">git push</code>
-        </div>
+        {ghToken ? (
+          <div className="mb-4 p-3 rounded-xl bg-green-500/8 border border-green-500/20 text-green-400 text-sm flex items-center gap-2">
+            <Check size={14} className="shrink-0" />
+            GitHub connected — edits are published automatically when you save.
+          </div>
+        ) : (
+          <div className="mb-4 p-3 rounded-xl bg-yellow-500/8 border border-yellow-500/20 text-yellow-400 text-sm flex items-center gap-3">
+            <Github size={14} className="shrink-0" />
+            <span>
+              <button onClick={() => setShowGhSettings(true)} className="underline font-medium">Connect a GitHub token</button>{' '}
+              to publish changes automatically. Without it, use <em>Download decks.js</em> to deploy manually.
+            </span>
+          </div>
+        )}
 
         <div className="space-y-2">
           {deckList.map((deck, idx) => (
@@ -627,13 +658,39 @@ export default function Admin() {
                 text-gray-300 hover:text-white text-sm font-medium transition-colors">
               <Download size={14} /> Download decks.js
             </button>
-            <button onClick={saveDeck}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl text-white text-sm font-semibold transition-all"
-              style={{ background: savedFlash ? '#22c55e' : '#2563eb' }}>
-              {savedFlash ? <><Check size={14} /> Saved!</> : 'Save Deck'}
+            <button onClick={saveDeck} disabled={pushStatus === 'pushing'}
+              className="flex items-center gap-2 px-5 py-2 rounded-xl text-white text-sm font-semibold transition-all disabled:opacity-60"
+              style={{ background: pushStatus === 'done' ? '#22c55e' : savedFlash ? '#16a34a' : '#2563eb' }}>
+              {pushStatus === 'pushing'
+                ? <><Loader2 size={14} className="animate-spin" /> Pushing…</>
+                : pushStatus === 'done'
+                  ? <><Check size={14} /> Live!</>
+                  : savedFlash
+                    ? <><Check size={14} /> Saved</>
+                    : ghToken ? 'Save & Publish' : 'Save Deck'}
             </button>
           </div>
         </div>
+
+        {/* Push status bar */}
+        {pushStatus === 'pushing' && (
+          <div className="mb-4 flex items-center gap-2 text-blue-400 text-sm p-3 rounded-xl bg-blue-500/8 border border-blue-500/20">
+            <Loader2 size={14} className="animate-spin shrink-0" />
+            Pushing to GitHub — site will redeploy in ~60 seconds…
+          </div>
+        )}
+        {pushStatus === 'done' && (
+          <div className="mb-4 flex items-center gap-2 text-green-400 text-sm p-3 rounded-xl bg-green-500/8 border border-green-500/20">
+            <Check size={14} className="shrink-0" />
+            Pushed! GitHub is rebuilding the site now.
+          </div>
+        )}
+        {pushStatus === 'error' && (
+          <div className="mb-4 text-red-400 text-sm p-3 rounded-xl bg-red-500/8 border border-red-500/20">
+            <strong>Push failed:</strong> {pushError}
+            {!ghToken && ' — connect a GitHub token to enable auto-push.'}
+          </div>
+        )}
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Left: Preview + Inventory */}
