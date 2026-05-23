@@ -558,7 +558,14 @@ export default function Admin() {
   const [deckList, setDeckList] = useState(() => {
     try {
       const saved = localStorage.getItem('adminDecks');
-      return saved ? JSON.parse(saved) : initialDecks.map(d => ({ ...d, quantity: d.quantity ?? 10 }));
+      if (!saved) return initialDecks.map(d => ({ ...d, quantity: d.quantity ?? 10 }));
+      const parsed = JSON.parse(saved);
+      // Auto-merge any decks added to decks.js that aren't in localStorage yet
+      const existingIds = new Set(parsed.map(d => d.id));
+      const newDecks = initialDecks
+        .filter(d => !existingIds.has(d.id))
+        .map(d => ({ ...d, quantity: d.quantity ?? 10 }));
+      return newDecks.length ? [...parsed, ...newDecks] : parsed;
     } catch { return initialDecks.map(d => ({ ...d, quantity: d.quantity ?? 10 })); }
   });
 
