@@ -8,6 +8,7 @@ import HowItWorks from './pages/HowItWorks';
 import Brackets from './pages/Brackets';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Admin from './pages/Admin';
 
 export default function App() {
   const [animationsEnabled, setAnimationsEnabled] = useState(true);
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/brackets" element={<Brackets />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </div>
     </HashRouter>
