@@ -245,6 +245,62 @@ export const decks = [
     included: ["99-card Commander deck", "Pilot guide booklet", "Clue token pack", "Aristocrat trigger reference", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
     quantity: 10,
+  },
+  {
+    id: 8,
+    name: "Ulalek Eldrazi Dominance",
+    commander: "Ulalek, Fused Atrocity",
+    price: 219,
+    bracket: 3,
+    colors: ["white", "blue", "black", "red", "green"],
+    colorLabel: "Five-Color Eldrazi",
+    difficulty: "Beginner",
+    playstyles: ["Ramp", "Tribal", "Tokens", "Go Wide"],
+    description: "Five-color Eldrazi deck that ramps into massive colorless threats, copies game-ending spells with Ulalek, and overwhelms the table with unstoppable Eldrazi.",
+    image: null,
+    gradientFrom: "#0d0020",
+    gradientTo: "#0a0a00",
+    accentColor: "#7c3aed",
+    glowClass: "glow-purple",
+    strategy: "Ulalek, Fused Atrocity is a five-color Eldrazi deck built to ramp hard into massive colorless creatures, copy their powerful spells and triggered abilities, and bury the table under an avalanche of Eldrazi. The deck uses a network of artifacts and talismans to build mana quickly, then leverages Ulalek's copy ability to turn one enormous Eldrazi into an absolute catastrophe for your opponents. Azlask, the Swelling Scourge provides a secondary payoff by rewarding you when your colorless creatures — including Eldrazi Spawn and Scion tokens — die, and can turn that token army into a lethal strike.",
+    wins: "You win by casting enormous Eldrazi finishers like Ulamog the Defiler, Emrakul the World Anew, Kozilek the Broken Reality, and It That Betrays — then using Ulalek to copy their cast triggers and abilities for maximum impact. Azlask can transform your token board into a devastating army. Eldrazi Conscription on any creature also threatens an immediate kill.",
+    pilotGuide: "Early game: focus purely on building mana. Play Sol Ring, Arcane Signet, Talismans, Hedron Archive, and Everflowing Chalice. From Beyond gives you Eldrazi Spawn tokens every turn while also tutoring for a key Eldrazi when needed. Don't commit to the board early — survive and ramp. Mid game: once you have 6–8 mana, cast Ulalek, Fused Atrocity. From this point, every Eldrazi you cast becomes dramatically more powerful. Cards like Kozilek's Command, Breaker of Creation, and Sire of Stagnation become even more punishing with Ulalek copying their effects. Late game: unleash your biggest Eldrazi. Ulamog, Emrakul, and Kozilek each have powerful cast triggers — Ulalek copies those. If an opponent has a solution, World Breaker and Not of This World protect your board and your threats.",
+    openingHand: "Keep any hand with at least 3 lands, one mana rock (Sol Ring, Talisman, Arcane Signet), and ideally a mid-sized Eldrazi or a ramp spell. Mulligan hands with no mana acceleration — this deck cannot afford a slow start. From Beyond in your opening hand is excellent as it provides both tokens and a tutor later.",
+    upgradePath: "Add Eldrazi Temple and Eye of Ugin to your mana base for even faster Eldrazi casting. Thought-Knot Seer and Reality Smasher add consistent mid-range pressure. Kozilek, Butcher of Truth provides immediate card draw on cast and graveyard recursion. Exploration and Cultivate help accelerate your land drops in the early game.",
+    tokensNeeded: "Eldrazi Spawn (0/1 colorless, sacrifice for 1 mana), Eldrazi Scion (1/1 colorless, sacrifice for 1 mana), 10/10 colorless Eldrazi, Copy token, Experience counter helper card, +1/+1 counter helper card",
+    fullDecklist: [
+      { section: "Commander", cards: ["Ulalek, Fused Atrocity"] },
+      { section: "Creatures (34)", cards: [
+        "Azlask, the Swelling Scourge","Ulamog's Dreadsire","Benthic Anomaly","Bismuth Mindrender",
+        "Twins of Discord","Spawnbed Protector","Chittering Dispatcher","Inversion Behemoth",
+        "Sire of Stagnation","Oblivion Sower","World Breaker","Sifter of Skulls","Endbringer",
+        "Eldrazi Displacer","Wastescape Battlemage","Snapping Voidcraw","Artisan of Kozilek",
+        "Glaring Fleshraker","Ulamog, the Defiler","Emrakul, the World Anew","Kozilek, the Broken Reality",
+        "Devourer of Destiny","Breaker of Creation","Drowner of Truth","Nulldrifter","Writhing Chrysalis",
+        "Basking Broodscale","Spawn-Gang Commander","Eldrazi Linebreaker","Eldrazi Repurposer",
+        "It That Heralds the End","Sowing Mycospawn","Conduit of Ruin","It That Betrays"
+      ]},
+      { section: "Spells & Artifacts (28)", cards: [
+        "Sol Ring","Arcane Signet","Talisman of Dominance","Talisman of Curiosity","Talisman of Impulse",
+        "Talisman of Resilience","Hedron Archive","Everflowing Chalice","Mystic Forge","Forsaken Monument",
+        "Herald's Horn","Urza's Incubator","Kozilek's Unsealing","Echoes of Eternity","Kozilek's Command",
+        "Ugin's Binding","All Is Dust","Eldrazi Confluence","Eldrazi Conscription","Eldritch Immunity",
+        "Return of the Wildspeaker","Garruk's Uprising","Warping Wail","Ancient Stirrings","Beast Within",
+        "From Beyond","Not of This World","Eldrazi Monument"
+      ]},
+      { section: "Lands (37)", cards: [
+        "Command Tower","Path of Ancestry","Exotic Orchard","Unclaimed Territory","Secluded Courtyard",
+        "Corrupted Crossroads","Eldrazi Temple","Shrine of the Forsaken Gods","Ugin's Labyrinth",
+        "Urza's Cave","Spawning Bed","Battlefield Forge","Llanowar Wastes","Brushland","Underground River",
+        "Adarkar Wastes","Karplusan Forest","Yavimaya Coast","Sulfurous Springs","Caves of Koilos",
+        "Shivan Reef","Bonders' Enclave","Reliquary Tower","Tomb of the Spirit Dragon","Ruins of Oran-Rief",
+        "Cascading Cataracts","Tendo Ice Bridge","Opal Palace","Ash Barrens","Twisted Landscape",
+        "Tranquil Landscape","Wastes","Plains","Island","Swamp","Mountain","Forest"
+      ]},
+    ],
+    included: ["99-card Commander deck", "Pilot guide booklet", "Eldrazi token pack", "Counter tracker set", "Upgrade path guide", "Storage sleeve set"],
+    featured: true,
+    quantity: 10,
   }
 ];
 
