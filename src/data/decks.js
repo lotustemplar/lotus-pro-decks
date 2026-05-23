@@ -252,12 +252,12 @@ export const decks = [
     commander: "Ulalek, Fused Atrocity",
     price: 219,
     bracket: 3,
-    colors: ["white", "blue", "black", "red", "green"],
+    colors: ["white","blue","black","red","green"],
     colorLabel: "Five-Color Eldrazi",
     difficulty: "Beginner",
-    playstyles: ["Ramp", "Tribal", "Tokens", "Go Wide"],
+    playstyles: ["Ramp","Tribal","Tokens","Go Wide"],
     description: "Five-color Eldrazi deck that ramps into massive colorless threats, copies game-ending spells with Ulalek, and overwhelms the table with unstoppable Eldrazi.",
-    image: null,
+    image: `${import.meta.env.BASE_URL}images/ulalek.png`,
     gradientFrom: "#0d0020",
     gradientTo: "#0a0a00",
     accentColor: "#7c3aed",
@@ -270,37 +270,13 @@ export const decks = [
     tokensNeeded: "Eldrazi Spawn (0/1 colorless, sacrifice for 1 mana), Eldrazi Scion (1/1 colorless, sacrifice for 1 mana), 10/10 colorless Eldrazi, Copy token, Experience counter helper card, +1/+1 counter helper card",
     fullDecklist: [
       { section: "Commander", cards: ["Ulalek, Fused Atrocity"] },
-      { section: "Creatures (34)", cards: [
-        "Azlask, the Swelling Scourge","Ulamog's Dreadsire","Benthic Anomaly","Bismuth Mindrender",
-        "Twins of Discord","Spawnbed Protector","Chittering Dispatcher","Inversion Behemoth",
-        "Sire of Stagnation","Oblivion Sower","World Breaker","Sifter of Skulls","Endbringer",
-        "Eldrazi Displacer","Wastescape Battlemage","Snapping Voidcraw","Artisan of Kozilek",
-        "Glaring Fleshraker","Ulamog, the Defiler","Emrakul, the World Anew","Kozilek, the Broken Reality",
-        "Devourer of Destiny","Breaker of Creation","Drowner of Truth","Nulldrifter","Writhing Chrysalis",
-        "Basking Broodscale","Spawn-Gang Commander","Eldrazi Linebreaker","Eldrazi Repurposer",
-        "It That Heralds the End","Sowing Mycospawn","Conduit of Ruin","It That Betrays"
-      ]},
-      { section: "Spells & Artifacts (28)", cards: [
-        "Sol Ring","Arcane Signet","Talisman of Dominance","Talisman of Curiosity","Talisman of Impulse",
-        "Talisman of Resilience","Hedron Archive","Everflowing Chalice","Mystic Forge","Forsaken Monument",
-        "Herald's Horn","Urza's Incubator","Kozilek's Unsealing","Echoes of Eternity","Kozilek's Command",
-        "Ugin's Binding","All Is Dust","Eldrazi Confluence","Eldrazi Conscription","Eldritch Immunity",
-        "Return of the Wildspeaker","Garruk's Uprising","Warping Wail","Ancient Stirrings","Beast Within",
-        "From Beyond","Not of This World","Eldrazi Monument"
-      ]},
-      { section: "Lands (37)", cards: [
-        "Command Tower","Path of Ancestry","Exotic Orchard","Unclaimed Territory","Secluded Courtyard",
-        "Corrupted Crossroads","Eldrazi Temple","Shrine of the Forsaken Gods","Ugin's Labyrinth",
-        "Urza's Cave","Spawning Bed","Battlefield Forge","Llanowar Wastes","Brushland","Underground River",
-        "Adarkar Wastes","Karplusan Forest","Yavimaya Coast","Sulfurous Springs","Caves of Koilos",
-        "Shivan Reef","Bonders' Enclave","Reliquary Tower","Tomb of the Spirit Dragon","Ruins of Oran-Rief",
-        "Cascading Cataracts","Tendo Ice Bridge","Opal Palace","Ash Barrens","Twisted Landscape",
-        "Tranquil Landscape","Wastes","Plains","Island","Swamp","Mountain","Forest"
-      ]},
+      { section: "Creatures (34)", cards: ["Azlask, the Swelling Scourge","Ulamog's Dreadsire","Benthic Anomaly","Bismuth Mindrender","Twins of Discord","Spawnbed Protector","Chittering Dispatcher","Inversion Behemoth","Sire of Stagnation","Oblivion Sower","World Breaker","Sifter of Skulls","Endbringer","Eldrazi Displacer","Wastescape Battlemage","Snapping Voidcraw","Artisan of Kozilek","Glaring Fleshraker","Ulamog, the Defiler","Emrakul, the World Anew","Kozilek, the Broken Reality","Devourer of Destiny","Breaker of Creation","Drowner of Truth","Nulldrifter","Writhing Chrysalis","Basking Broodscale","Spawn-Gang Commander","Eldrazi Linebreaker","Eldrazi Repurposer","It That Heralds the End","Sowing Mycospawn","Conduit of Ruin","It That Betrays"] },
+      { section: "Spells & Artifacts (28)", cards: ["Sol Ring","Arcane Signet","Talisman of Dominance","Talisman of Curiosity","Talisman of Impulse","Talisman of Resilience","Hedron Archive","Everflowing Chalice","Mystic Forge","Forsaken Monument","Herald's Horn","Urza's Incubator","Kozilek's Unsealing","Echoes of Eternity","Kozilek's Command","Ugin's Binding","All Is Dust","Eldrazi Confluence","Eldrazi Conscription","Eldritch Immunity","Return of the Wildspeaker","Garruk's Uprising","Warping Wail","Ancient Stirrings","Beast Within","From Beyond","Not of This World","Eldrazi Monument"] },
+      { section: "Lands (37)", cards: ["Command Tower","Path of Ancestry","Exotic Orchard","Unclaimed Territory","Secluded Courtyard","Corrupted Crossroads","Eldrazi Temple","Shrine of the Forsaken Gods","Ugin's Labyrinth","Urza's Cave","Spawning Bed","Battlefield Forge","Llanowar Wastes","Brushland","Underground River","Adarkar Wastes","Karplusan Forest","Yavimaya Coast","Sulfurous Springs","Caves of Koilos","Shivan Reef","Bonders' Enclave","Reliquary Tower","Tomb of the Spirit Dragon","Ruins of Oran-Rief","Cascading Cataracts","Tendo Ice Bridge","Opal Palace","Ash Barrens","Twisted Landscape","Tranquil Landscape","Wastes","Plains","Island","Swamp","Mountain","Forest"] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Eldrazi token pack", "Counter tracker set", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
-    quantity: 10,
+    quantity: 1,
   }
 ];
 
@@ -310,8 +286,7 @@ export const colorMeta = {
   black: { label: "Black",      hex: "#7c3aed", icon: "💀", desc: "Sacrifice & Drain",  glowClass: "glow-purple" },
   white: { label: "White",      hex: "#f59e0b", icon: "☀️", desc: "Lifegain & Tokens",  glowClass: "glow-gold" },
   green: { label: "Green",      hex: "#22c55e", icon: "🌿", desc: "Ramp & Creatures",   glowClass: "glow-green" },
-  multi:     { label: "Multicolor", hex: "#ec4899", icon: "✨", desc: "All Combinations",    glowClass: "glow-pink" },
-  colorless: { label: "Colorless",  hex: "#9ca3af", icon: "◇",  desc: "Eldrazi & Artifacts", glowClass: "glow-gray" },
+  multi: { label: "Multicolor", hex: "#ec4899", icon: "✨", desc: "All Combinations",   glowClass: "glow-pink" },
 };
 
 export const playstyleMeta = [
