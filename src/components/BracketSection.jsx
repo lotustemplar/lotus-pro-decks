@@ -28,7 +28,7 @@ const BRACKETS = [
     color: '#ef4444',
     desc: 'High-powered, tournament-tuned decks built to dominate. These are for experienced players who know the game inside and out and want to play at the highest casual level.',
     traits: ['Optimized card selections', 'Fast and consistent engines', 'Multiple win conditions', 'Handles interaction well', 'For seasoned players only'],
-    icon: '🔥',
+    icon: '🏆',
     example: 'Coming soon — premium competitive builds',
   },
 ];
