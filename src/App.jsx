@@ -13,7 +13,7 @@ export default function App() {
   const [animationsEnabled, setAnimationsEnabled] = useState(true);
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <div className="min-h-screen bg-[#0a0e1a] text-white">
         <Nav animationsEnabled={animationsEnabled} setAnimationsEnabled={setAnimationsEnabled} />
         <Routes>
