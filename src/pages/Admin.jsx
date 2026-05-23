@@ -3,7 +3,7 @@ import { decks as initialDecks, colorMeta, playstyleMeta } from '../data/decks';
 import {
   Plus, Trash2, Edit2, Download, X, Check,
   ChevronUp, ChevronDown, Upload, Settings, Lock, Eye, EyeOff, Github,
-  ImagePlus, Loader2
+  ImagePlus, Loader2, RefreshCw
 } from 'lucide-react';
 
 // ─── Color / gradient presets ─────────────────────────────────────────────────
@@ -576,6 +576,13 @@ export default function Admin() {
   if (!authed) return <LoginGate onAuth={() => setAuthed(true)} />;
 
   // ── List helpers ─────────────────────────────────────────────────────────────
+  function syncFromSource() {
+    // Add any decks from initialDecks that aren't in deckList yet (by id)
+    const existingIds = new Set(deckList.map(d => d.id));
+    const newDecks = initialDecks.filter(d => !existingIds.has(d.id)).map(d => ({ ...d, quantity: d.quantity ?? 10 }));
+    if (!newDecks.length) { alert('Already up to date — no new decks found in source.'); return; }
+    setDeckList(p => [...p, ...newDecks]);
+  }
   function newDeck()  { setEditing({ ...BLANK_DECK, id: Date.now() }); setActiveTab('basic'); }
   function editDeck(d){ setEditing(JSON.parse(JSON.stringify(d)));       setActiveTab('basic'); }
   function deleteDeck(id) {
@@ -663,6 +670,13 @@ export default function Admin() {
               title={ghToken ? 'GitHub connected' : 'Connect GitHub'}>
               <Github size={15} />
               <span className="hidden sm:inline">{ghToken ? 'GitHub ✓' : 'GitHub'}</span>
+            </button>
+            <button onClick={syncFromSource}
+              className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/5 border border-white/10
+                text-gray-400 hover:text-white text-sm transition-colors"
+              title="Pull new decks added to decks.js into the admin">
+              <RefreshCw size={14} />
+              <span className="hidden sm:inline">Sync</span>
             </button>
             <button onClick={downloadDecksJs}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10
