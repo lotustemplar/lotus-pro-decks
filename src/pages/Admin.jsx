@@ -1,8 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { decks as initialDecks, colorMeta, playstyleMeta } from '../data/decks';
-import { Plus, Trash2, Edit2, Download, X, Check, ChevronUp, ChevronDown } from 'lucide-react';
+import {
+  Plus, Trash2, Edit2, Download, X, Check,
+  ChevronUp, ChevronDown, Upload, Settings, Lock, Eye, EyeOff, Github,
+  ImagePlus, Loader2
+} from 'lucide-react';
 
-// ─── Color / gradient presets keyed by sorted color combos ───────────────────
+// ─── Color / gradient presets ─────────────────────────────────────────────────
 const COLOR_PRESETS = {
   red:          { accentColor: '#ef4444', gradientFrom: '#1a0000', gradientTo: '#0a0000', glowClass: 'glow-red' },
   blue:         { accentColor: '#3b82f6', gradientFrom: '#00001a', gradientTo: '#000010', glowClass: 'glow-blue' },
@@ -20,14 +24,12 @@ const COLOR_PRESETS = {
   'green,red':  { accentColor: '#f97316', gradientFrom: '#1a0000', gradientTo: '#001a00', glowClass: 'glow-red' },
   'black,blue': { accentColor: '#818cf8', gradientFrom: '#00001a', gradientTo: '#0d0020', glowClass: 'glow-blue' },
 };
-
 const COLOR_LABELS = {
   red: 'Mono Red', blue: 'Mono Blue', black: 'Mono Black', white: 'Mono White', green: 'Mono Green',
   'black,white': 'White / Black', 'black,green': 'Black / Green', 'black,red': 'Black / Red',
   'blue,red': 'Blue / Red', 'blue,white': 'Blue / White', 'green,white': 'Green / White',
   'blue,green': 'Simic', 'red,white': 'Red / White', 'green,red': 'Gruul', 'black,blue': 'Dimir',
 };
-
 const MTG_COLORS = [
   { key: 'white', symbol: 'W', hex: '#f59e0b' },
   { key: 'blue',  symbol: 'U', hex: '#3b82f6' },
@@ -35,45 +37,70 @@ const MTG_COLORS = [
   { key: 'red',   symbol: 'R', hex: '#ef4444' },
   { key: 'green', symbol: 'G', hex: '#22c55e' },
 ];
-
 const DIFFICULTY_OPTIONS = ['Beginner', 'Easy', 'Moderate', 'Advanced'];
+const REPO_OWNER = 'lotustemplar';
+const REPO_NAME  = 'propilot-decks';
 
-function colorKey(colors) {
-  return [...colors].sort().join(',');
-}
-
+function colorKey(c) { return [...c].sort().join(','); }
 function deriveColorMeta(colors) {
-  if (colors.length === 0) return { accentColor: '#6366f1', gradientFrom: '#0a0a1a', gradientTo: '#1a0a1a', glowClass: 'glow-purple', colorLabel: 'Colorless' };
+  if (!colors.length) return { accentColor: '#6366f1', gradientFrom: '#0a0a1a', gradientTo: '#1a0a1a', glowClass: 'glow-purple', colorLabel: 'Colorless' };
   if (colors.length >= 3) return { accentColor: '#ec4899', gradientFrom: '#1a001a', gradientTo: '#001a1a', glowClass: 'glow-pink', colorLabel: 'Multicolor' };
   const key = colorKey(colors);
   const preset = COLOR_PRESETS[key] || COLOR_PRESETS[colors[0]] || COLOR_PRESETS.black;
-  return { ...preset, colorLabel: COLOR_LABELS[key] || colors.map(c => c.charAt(0).toUpperCase() + c.slice(1)).join(' / ') };
+  return { ...preset, colorLabel: COLOR_LABELS[key] || colors.map(c => c[0].toUpperCase() + c.slice(1)).join(' / ') };
+}
+function imageFilename(p) { return p ? p.split('/').pop() : ''; }
+function buildImagePath(f) { return f ? `${import.meta.env.BASE_URL}images/${f}` : null; }
+
+// ─── Hash helper ──────────────────────────────────────────────────────────────
+async function sha256(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-function imageFilename(imagePath) {
-  if (!imagePath) return '';
-  return imagePath.split('/').pop();
+// ─── GitHub image upload ──────────────────────────────────────────────────────
+async function uploadToGitHub(file, token) {
+  const filename = file.name.toLowerCase().replace(/\s+/g, '-');
+  const base64 = await new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+
+  const path = `public/images/${filename}`;
+  const apiBase = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`;
+  const headers = {
+    Authorization: `token ${token}`,
+    Accept: 'application/vnd.github.v3+json',
+    'Content-Type': 'application/json',
+  };
+
+  // Check if file exists (need SHA for updates)
+  let sha;
+  const check = await fetch(apiBase, { headers });
+  if (check.ok) { const j = await check.json(); sha = j.sha; }
+
+  const body = { message: `Add deck image: ${filename}`, content: base64 };
+  if (sha) body.sha = sha;
+
+  const res = await fetch(apiBase, { method: 'PUT', headers, body: JSON.stringify(body) });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || 'GitHub upload failed');
+  }
+  return filename;
 }
 
-function buildImagePath(filename) {
-  if (!filename) return null;
-  return `${import.meta.env.BASE_URL}images/${filename}`;
-}
-
-// ─── Generate decks.js content for export ────────────────────────────────────
+// ─── Generate decks.js content ────────────────────────────────────────────────
 function generateDecksJs(deckList) {
-  const deckEntries = deckList.map(deck => {
-    const filename = imageFilename(deck.image);
-    const imageStr = filename
-      ? `\`\${import.meta.env.BASE_URL}images/${filename}\``
-      : 'null';
-
+  const entries = deckList.map(deck => {
+    const fn = imageFilename(deck.image);
+    const imageStr = fn ? `\`\${import.meta.env.BASE_URL}images/${fn}\`` : 'null';
     const decklist = deck.fullDecklist
       .map(s => `      { section: ${JSON.stringify(s.section)}, cards: ${JSON.stringify(s.cards)} }`)
       .join(',\n');
-
-    const included = deck.included.map(i => `"${i}"`).join(', ');
-
+    const included = (deck.included || []).map(i => `"${i}"`).join(', ');
     return `  {
     id: ${deck.id},
     name: ${JSON.stringify(deck.name)},
@@ -84,7 +111,7 @@ function generateDecksJs(deckList) {
     colorLabel: ${JSON.stringify(deck.colorLabel)},
     difficulty: ${JSON.stringify(deck.difficulty)},
     playstyles: ${JSON.stringify(deck.playstyles)},
-    description: ${JSON.stringify(deck.description)},
+    description: ${JSON.stringify(deck.description || '')},
     image: ${imageStr},
     gradientFrom: ${JSON.stringify(deck.gradientFrom)},
     gradientTo: ${JSON.stringify(deck.gradientTo)},
@@ -98,19 +125,19 @@ function generateDecksJs(deckList) {
     tokensNeeded: ${JSON.stringify(deck.tokensNeeded || '')},
     fullDecklist: [\n${decklist}\n    ],
     included: [${included}],
-    featured: ${deck.featured},
+    featured: ${!!deck.featured},
     quantity: ${deck.quantity ?? 10},
   }`;
   }).join(',\n');
 
-  return `export const decks = [\n${deckEntries}\n];\n
+  return `export const decks = [\n${entries}\n];\n
 export const colorMeta = {
-  red:   { label: "Red",        hex: "#ef4444", icon: "🔥", desc: "Aggro & Burn",        glowClass: "glow-red" },
-  blue:  { label: "Blue",       hex: "#3b82f6", icon: "💧", desc: "Control & Combo",      glowClass: "glow-blue" },
-  black: { label: "Black",      hex: "#7c3aed", icon: "💀", desc: "Sacrifice & Drain",    glowClass: "glow-purple" },
-  white: { label: "White",      hex: "#f59e0b", icon: "☀️", desc: "Lifegain & Tokens",    glowClass: "glow-gold" },
-  green: { label: "Green",      hex: "#22c55e", icon: "🌿", desc: "Ramp & Creatures",     glowClass: "glow-green" },
-  multi: { label: "Multicolor", hex: "#ec4899", icon: "✨", desc: "All Combinations",     glowClass: "glow-pink" },
+  red:   { label: "Red",        hex: "#ef4444", icon: "🔥", desc: "Aggro & Burn",      glowClass: "glow-red" },
+  blue:  { label: "Blue",       hex: "#3b82f6", icon: "💧", desc: "Control & Combo",    glowClass: "glow-blue" },
+  black: { label: "Black",      hex: "#7c3aed", icon: "💀", desc: "Sacrifice & Drain",  glowClass: "glow-purple" },
+  white: { label: "White",      hex: "#f59e0b", icon: "☀️", desc: "Lifegain & Tokens",  glowClass: "glow-gold" },
+  green: { label: "Green",      hex: "#22c55e", icon: "🌿", desc: "Ramp & Creatures",   glowClass: "glow-green" },
+  multi: { label: "Multicolor", hex: "#ec4899", icon: "✨", desc: "All Combinations",   glowClass: "glow-pink" },
 };
 
 export const playstyleMeta = [
@@ -134,143 +161,332 @@ const BLANK_DECK = {
     { section: 'Lands (36)', cards: [] },
   ],
   included: ['99-card Commander deck', 'Pilot guide booklet', 'Synergy cheat sheet', 'Upgrade path guide', 'Storage sleeve set'],
-  featured: false,
-  quantity: 10,
+  featured: false, quantity: 10,
 };
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// ─── Small UI helpers ─────────────────────────────────────────────────────────
 function Field({ label, value, onChange, placeholder, type = 'text' }) {
   return (
     <div>
       <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">{label}</label>
-      <input
-        type={type}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm placeholder-gray-600
-          focus:outline-none focus:border-blue-500 transition-colors"
-      />
+      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
+          placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors" />
     </div>
   );
 }
-
 function TextArea({ label, value, onChange, rows = 3, placeholder }) {
   return (
     <div>
       <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">{label}</label>
-      <textarea
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        rows={rows}
-        placeholder={placeholder}
+      <textarea value={value} onChange={e => onChange(e.target.value)} rows={rows} placeholder={placeholder}
         className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm
-          placeholder-gray-600 focus:outline-none focus:border-blue-500 leading-relaxed resize-none transition-colors"
-      />
+          placeholder-gray-600 focus:outline-none focus:border-blue-500 leading-relaxed resize-none transition-colors" />
     </div>
   );
 }
-
 function Toggle({ checked, onChange, label }) {
   return (
     <label className="flex items-center gap-3 cursor-pointer select-none">
-      <div
-        onClick={() => onChange(!checked)}
+      <div onClick={() => onChange(!checked)}
         className="w-10 h-6 rounded-full transition-colors relative shrink-0"
-        style={{ background: checked ? '#3b82f6' : '#374151' }}
-      >
-        <div
-          className="absolute top-1 w-4 h-4 rounded-full bg-white transition-transform"
-          style={{ transform: checked ? 'translateX(18px)' : 'translateX(2px)' }}
-        />
+        style={{ background: checked ? '#3b82f6' : '#374151' }}>
+        <div className="absolute top-1 w-4 h-4 rounded-full bg-white transition-transform"
+          style={{ transform: checked ? 'translateX(18px)' : 'translateX(2px)' }} />
       </div>
       <span className="text-sm text-gray-300">{label}</span>
     </label>
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// ─── Password gate ────────────────────────────────────────────────────────────
+const STORED_HASH_KEY = 'admin_pw_hash';
+const SESSION_KEY     = 'admin_authed';
+const CORRECT_HASH    = import.meta.env.VITE_ADMIN_PASSWORD_HASH || null;
+
+function LoginGate({ onAuth }) {
+  const [pw, setPw]           = useState('');
+  const [show, setShow]       = useState(false);
+  const [err, setErr]         = useState('');
+  const [loading, setLoading] = useState(false);
+  const [mode, setMode]       = useState('login'); // 'login' | 'setup'
+
+  // First-run: no server hash AND no locally stored hash → show setup
+  const localHash = localStorage.getItem(STORED_HASH_KEY);
+  const hasAnyHash = CORRECT_HASH || localHash;
+
+  useEffect(() => {
+    if (!hasAnyHash) setMode('setup');
+  }, [hasAnyHash]);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!pw.trim()) return;
+    setLoading(true);
+    setErr('');
+    const entered = await sha256(pw);
+
+    if (mode === 'setup') {
+      // First-run: save hash locally, log in
+      localStorage.setItem(STORED_HASH_KEY, entered);
+      sessionStorage.setItem(SESSION_KEY, '1');
+      onAuth();
+      return;
+    }
+
+    // Normal login: check server hash first, then local hash fallback
+    const match = (CORRECT_HASH && entered === CORRECT_HASH)
+      || (!CORRECT_HASH && localHash && entered === localHash);
+    if (match) {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      onAuth();
+    } else {
+      setErr('Incorrect password.');
+      setPw('');
+    }
+    setLoading(false);
+  }
+
+  return (
+    <div className="min-h-screen bg-[#0a0e1a] flex items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        <div className="flex justify-center mb-8">
+          <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+            <Lock size={24} className="text-blue-400" />
+          </div>
+        </div>
+        <h1 className="text-2xl font-display font-bold text-white text-center mb-1">
+          {mode === 'setup' ? 'Create Admin Password' : 'Admin Access'}
+        </h1>
+        <p className="text-gray-500 text-sm text-center mb-8">
+          {mode === 'setup'
+            ? 'First time setup — choose a password for this admin panel.'
+            : 'ProPilot Decks admin panel'}
+        </p>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="relative">
+            <input
+              type={show ? 'text' : 'password'}
+              value={pw}
+              onChange={e => { setPw(e.target.value); setErr(''); }}
+              placeholder="Password"
+              autoFocus
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-11 text-white
+                placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors"
+            />
+            <button type="button" onClick={() => setShow(s => !s)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors">
+              {show ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+          {err && <p className="text-red-400 text-sm text-center">{err}</p>}
+          <button type="submit" disabled={loading || !pw}
+            className="w-full py-3 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-500
+              disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
+            {loading && <Loader2 size={16} className="animate-spin" />}
+            {mode === 'setup' ? 'Set Password & Enter' : 'Sign In'}
+          </button>
+        </form>
+        {mode === 'setup' && (
+          <p className="text-xs text-gray-600 text-center mt-4">
+            Password is hashed and stored locally in your browser.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── GitHub settings panel ────────────────────────────────────────────────────
+function GitHubSettings({ token, onSave, onClose }) {
+  const [val, setVal] = useState(token || '');
+  const [show, setShow] = useState(false);
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div className="relative z-10 w-full max-w-md bg-[#0f1629] rounded-2xl border border-white/10 p-6"
+        onClick={e => e.stopPropagation()}>
+        <div className="flex items-center gap-3 mb-5">
+          <Github size={20} className="text-gray-400" />
+          <h2 className="font-display font-bold text-white">GitHub Integration</h2>
+          <button onClick={onClose} className="ml-auto text-gray-500 hover:text-white transition-colors"><X size={16} /></button>
+        </div>
+        <p className="text-sm text-gray-400 mb-4 leading-relaxed">
+          A Personal Access Token lets the admin upload images directly to your GitHub repo.
+          Create one at <a href="https://github.com/settings/tokens" target="_blank" rel="noreferrer"
+            className="text-blue-400 underline">github.com/settings/tokens</a> with <code className="text-gray-300 bg-white/10 px-1 rounded">contents:write</code> permission.
+        </p>
+        <div className="relative mb-4">
+          <input type={show ? 'text' : 'password'} value={val} onChange={e => setVal(e.target.value)}
+            placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 pr-10 text-white text-sm
+              font-mono focus:outline-none focus:border-blue-500 transition-colors" />
+          <button type="button" onClick={() => setShow(s => !s)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors">
+            {show ? <EyeOff size={14} /> : <Eye size={14} />}
+          </button>
+        </div>
+        <p className="text-xs text-gray-600 mb-5">Token is stored only in your browser — never sent anywhere except GitHub's API.</p>
+        <div className="flex gap-3">
+          <button onClick={() => { onSave(val.trim()); onClose(); }}
+            className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors">
+            Save Token
+          </button>
+          {token && (
+            <button onClick={() => { onSave(''); onClose(); }}
+              className="px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm transition-colors">
+              Remove
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Image upload button ──────────────────────────────────────────────────────
+function ImageUploader({ token, currentImage, onUploaded }) {
+  const fileRef  = useRef();
+  const [state, setState] = useState('idle'); // idle | uploading | done | error
+  const [errMsg, setErrMsg] = useState('');
+
+  async function handleFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { setErrMsg('Not an image file'); return; }
+
+    if (!token) {
+      // No token — just preview locally
+      onUploaded(file.name, URL.createObjectURL(file));
+      return;
+    }
+
+    setState('uploading');
+    setErrMsg('');
+    try {
+      const filename = await uploadToGitHub(file, token);
+      onUploaded(filename, buildImagePath(filename));
+      setState('done');
+      setTimeout(() => setState('idle'), 3000);
+    } catch (err) {
+      setErrMsg(err.message);
+      setState('error');
+    }
+  }
+
+  const hasImage = !!currentImage;
+
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Deck Image</label>
+      <div
+        onClick={() => fileRef.current.click()}
+        className="relative cursor-pointer rounded-xl border-2 border-dashed transition-colors overflow-hidden group"
+        style={{ borderColor: hasImage ? 'transparent' : 'rgba(255,255,255,0.12)' }}
+      >
+        {hasImage ? (
+          <div className="relative aspect-video w-full overflow-hidden rounded-xl">
+            <img src={currentImage} alt="" className="w-full h-full object-contain bg-[#0a0e1a]" />
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity
+              flex items-center justify-center">
+              <div className="flex items-center gap-2 text-white text-sm font-medium">
+                <Upload size={16} /> Replace image
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="py-10 flex flex-col items-center gap-3 text-gray-600 hover:text-gray-400 transition-colors">
+            <ImagePlus size={28} />
+            <div className="text-sm text-center">
+              <span className="text-blue-400 font-medium">Click to upload</span> a PNG or JPG
+              {token && <div className="text-xs mt-0.5 text-gray-600">Auto-pushed to GitHub</div>}
+              {!token && <div className="text-xs mt-0.5 text-yellow-600">Set GitHub token to auto-push</div>}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+
+      {state === 'uploading' && (
+        <div className="flex items-center gap-2 mt-2 text-blue-400 text-xs">
+          <Loader2 size={12} className="animate-spin" /> Uploading to GitHub…
+        </div>
+      )}
+      {state === 'done' && (
+        <div className="flex items-center gap-2 mt-2 text-green-400 text-xs">
+          <Check size={12} /> Pushed! Deploy triggered automatically.
+        </div>
+      )}
+      {state === 'error' && (
+        <div className="mt-2 text-red-400 text-xs">{errMsg}</div>
+      )}
+      {!token && hasImage && (
+        <p className="text-xs text-yellow-600 mt-1">Add a GitHub token to auto-push images.</p>
+      )}
+    </div>
+  );
+}
+
+// ─── Main admin component ─────────────────────────────────────────────────────
 export default function Admin() {
+  // Auth
+  const [authed, setAuthed] = useState(() => !!sessionStorage.getItem(SESSION_KEY));
+
+  // GitHub token
+  const [ghToken, setGhToken] = useState(() => localStorage.getItem('admin_gh_token') || '');
+  const [showGhSettings, setShowGhSettings] = useState(false);
+
+  // Deck state
   const [deckList, setDeckList] = useState(() => {
     try {
       const saved = localStorage.getItem('adminDecks');
-      return saved
-        ? JSON.parse(saved)
-        : initialDecks.map(d => ({ ...d, quantity: d.quantity ?? 10 }));
+      return saved ? JSON.parse(saved) : initialDecks.map(d => ({ ...d, quantity: d.quantity ?? 10 }));
     } catch { return initialDecks.map(d => ({ ...d, quantity: d.quantity ?? 10 })); }
   });
 
-  const [editing, setEditing] = useState(null);
+  const [editing, setEditing]     = useState(null);
   const [activeTab, setActiveTab] = useState('basic');
-  const [savedFlash, setSavedFlash] = useState(false);
-  const [exportFlash, setExportFlash] = useState(false);
+  const [savedFlash, setSaved]    = useState(false);
+  const [exportFlash, setExport]  = useState(false);
 
-  useEffect(() => {
-    localStorage.setItem('adminDecks', JSON.stringify(deckList));
-  }, [deckList]);
+  useEffect(() => { localStorage.setItem('adminDecks', JSON.stringify(deckList)); }, [deckList]);
+  useEffect(() => { localStorage.setItem('admin_gh_token', ghToken); }, [ghToken]);
 
-  // ── List actions ────────────────────────────────────────────────────────────
-  function newDeck() {
-    setEditing({ ...BLANK_DECK, id: Date.now() });
-    setActiveTab('basic');
-  }
+  if (!authed) return <LoginGate onAuth={() => setAuthed(true)} />;
 
-  function editDeck(deck) {
-    setEditing(JSON.parse(JSON.stringify(deck)));
-    setActiveTab('basic');
-  }
-
+  // ── List helpers ─────────────────────────────────────────────────────────────
+  function newDeck()  { setEditing({ ...BLANK_DECK, id: Date.now() }); setActiveTab('basic'); }
+  function editDeck(d){ setEditing(JSON.parse(JSON.stringify(d)));       setActiveTab('basic'); }
   function deleteDeck(id) {
-    if (!window.confirm('Delete this deck? This cannot be undone.')) return;
-    setDeckList(prev => prev.filter(d => d.id !== id));
+    if (!window.confirm('Delete this deck?')) return;
+    setDeckList(p => p.filter(d => d.id !== id));
     if (editing?.id === id) setEditing(null);
   }
-
   function moveDeck(id, dir) {
-    setDeckList(prev => {
-      const idx = prev.findIndex(d => d.id === id);
-      const next = idx + dir;
-      if (next < 0 || next >= prev.length) return prev;
-      const arr = [...prev];
-      [arr[idx], arr[next]] = [arr[next], arr[idx]];
-      return arr;
+    setDeckList(p => {
+      const i = p.findIndex(d => d.id === id), j = i + dir;
+      if (j < 0 || j >= p.length) return p;
+      const a = [...p]; [a[i], a[j]] = [a[j], a[i]]; return a;
     });
   }
 
-  // ── Edit actions ────────────────────────────────────────────────────────────
-  function set(key, val) { setEditing(prev => ({ ...prev, [key]: val })); }
-
-  function toggleColor(color) {
-    const next = editing.colors.includes(color)
-      ? editing.colors.filter(c => c !== color)
-      : [...editing.colors, color];
-    const meta = deriveColorMeta(next);
-    setEditing(prev => ({ ...prev, colors: next, ...meta }));
+  // ── Edit helpers ─────────────────────────────────────────────────────────────
+  function set(k, v)    { setEditing(p => ({ ...p, [k]: v })); }
+  function toggleColor(c) {
+    const next = editing.colors.includes(c) ? editing.colors.filter(x => x !== c) : [...editing.colors, c];
+    setEditing(p => ({ ...p, colors: next, ...deriveColorMeta(next) }));
   }
-
-  function togglePlaystyle(tag) {
-    const next = editing.playstyles.includes(tag)
-      ? editing.playstyles.filter(t => t !== tag)
-      : [...editing.playstyles, tag];
-    set('playstyles', next);
+  function toggleStyle(t) {
+    set('playstyles', editing.playstyles.includes(t) ? editing.playstyles.filter(x => x !== t) : [...editing.playstyles, t]);
   }
-
   function saveDeck() {
     const exists = deckList.some(d => d.id === editing.id);
-    setDeckList(prev =>
-      exists ? prev.map(d => d.id === editing.id ? editing : d) : [...prev, editing]
-    );
-    setSavedFlash(true);
-    setTimeout(() => setSavedFlash(false), 2000);
+    setDeckList(p => exists ? p.map(d => d.id === editing.id ? editing : d) : [...p, editing]);
+    setSaved(true); setTimeout(() => setSaved(false), 2000);
   }
-
-  // ── Decklist section helpers ────────────────────────────────────────────────
-  function addSection() {
-    set('fullDecklist', [...editing.fullDecklist, { section: 'New Section', cards: [] }]);
-  }
-  function removeSection(i) {
-    set('fullDecklist', editing.fullDecklist.filter((_, idx) => idx !== i));
-  }
+  function addSection() { set('fullDecklist', [...editing.fullDecklist, { section: 'New Section', cards: [] }]); }
+  function removeSection(i) { set('fullDecklist', editing.fullDecklist.filter((_, idx) => idx !== i)); }
   function updateSection(i, key, val) {
     set('fullDecklist', editing.fullDecklist.map((s, idx) => idx === i ? { ...s, [key]: val } : s));
   }
@@ -278,179 +494,158 @@ export default function Admin() {
     updateSection(i, 'cards', text.split('\n').map(c => c.trim()).filter(Boolean));
   }
 
-  // ── Export ──────────────────────────────────────────────────────────────────
+  // ── Export ───────────────────────────────────────────────────────────────────
   function downloadDecksJs() {
     const blob = new Blob([generateDecksJs(deckList)], { type: 'text/javascript' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
     a.href = url; a.download = 'decks.js'; a.click();
     URL.revokeObjectURL(url);
-    setExportFlash(true);
-    setTimeout(() => setExportFlash(false), 2000);
+    setExport(true); setTimeout(() => setExport(false), 2000);
   }
 
-  // ── Render: List view ───────────────────────────────────────────────────────
-  if (!editing) {
-    return (
-      <div className="min-h-screen bg-[#0a0e1a] pt-20 pb-20 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-display font-bold text-white">Deck Admin</h1>
-              <p className="text-gray-500 text-sm mt-1">
-                {deckList.length} deck{deckList.length !== 1 ? 's' : ''} · edits saved in browser
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={downloadDecksJs}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10
-                  text-gray-300 hover:text-white text-sm font-medium transition-colors"
-              >
-                <Download size={14} />
-                {exportFlash ? 'Downloaded!' : 'Download decks.js'}
-              </button>
-              <button
-                onClick={newDeck}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500
-                  text-white text-sm font-semibold transition-colors"
-              >
-                <Plus size={16} /> New Deck
-              </button>
-            </div>
+  // ── List view ────────────────────────────────────────────────────────────────
+  if (!editing) return (
+    <div className="min-h-screen bg-[#0a0e1a] pt-20 pb-20 px-4 sm:px-6">
+      {showGhSettings && (
+        <GitHubSettings token={ghToken} onSave={setGhToken} onClose={() => setShowGhSettings(false)} />
+      )}
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-display font-bold text-white">Deck Admin</h1>
+            <p className="text-gray-500 text-sm mt-0.5">{deckList.length} deck{deckList.length !== 1 ? 's' : ''}</p>
           </div>
-
-          <div className="mb-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-sm">
-            <strong>Workflow:</strong> Edit decks here → click <em>Download decks.js</em> → replace
-            <code className="mx-1 text-amber-200 bg-black/30 px-1 rounded">src/data/decks.js</code>
-            → <code className="text-amber-200 bg-black/30 px-1 rounded">git push</code> to deploy.
-          </div>
-
-          <div className="space-y-2">
-            {deckList.map((deck, idx) => (
-              <div
-                key={deck.id}
-                className="flex items-center gap-4 p-4 rounded-2xl bg-white/3 border border-white/8
-                  hover:border-white/15 transition-colors group"
-              >
-                {/* Thumbnail */}
-                <div
-                  className="w-14 h-14 rounded-xl overflow-hidden shrink-0"
-                  style={{ background: `linear-gradient(135deg, ${deck.gradientFrom}, ${deck.gradientTo})` }}
-                >
-                  {deck.image && (
-                    <img src={deck.image} alt="" className="w-full h-full object-contain" />
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-white truncate">{deck.name || 'Untitled Deck'}</div>
-                  <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-2 flex-wrap">
-                    <span>{deck.commander || '—'}</span>
-                    <span className="text-gray-700">·</span>
-                    <span>B{deck.bracket}</span>
-                    <span className="text-gray-700">·</span>
-                    <span>${deck.price}</span>
-                    <span className="text-gray-700">·</span>
-                    <span>Qty: {deck.quantity ?? '—'}</span>
-                  </div>
-                </div>
-
-                {/* Color dots */}
-                <div className="hidden sm:flex items-center gap-1">
-                  {deck.colors.map(c => (
-                    <span key={c} className="w-3 h-3 rounded-full" style={{ background: colorMeta[c]?.hex }} />
-                  ))}
-                </div>
-
-                {/* Featured badge */}
-                <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
-                  deck.featured ? 'bg-yellow-500/20 text-yellow-400' : 'bg-white/5 text-gray-600'
-                }`}>
-                  {deck.featured ? 'Featured' : 'Hidden'}
-                </span>
-
-                {/* Actions */}
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => moveDeck(deck.id, -1)} disabled={idx === 0}
-                    className="p-1.5 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white disabled:opacity-20 transition-colors">
-                    <ChevronUp size={13} />
-                  </button>
-                  <button onClick={() => moveDeck(deck.id, 1)} disabled={idx === deckList.length - 1}
-                    className="p-1.5 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white disabled:opacity-20 transition-colors">
-                    <ChevronDown size={13} />
-                  </button>
-                  <button onClick={() => editDeck(deck)}
-                    className="p-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors ml-1">
-                    <Edit2 size={13} />
-                  </button>
-                  <button onClick={() => deleteDeck(deck.id)}
-                    className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors">
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              </div>
-            ))}
+          <div className="flex gap-2">
+            <button onClick={() => setShowGhSettings(true)}
+              className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/5 border border-white/10
+                text-gray-400 hover:text-white text-sm transition-colors"
+              title={ghToken ? 'GitHub connected' : 'Connect GitHub'}>
+              <Github size={15} />
+              <span className="hidden sm:inline">{ghToken ? 'GitHub ✓' : 'GitHub'}</span>
+            </button>
+            <button onClick={downloadDecksJs}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10
+                text-gray-300 hover:text-white text-sm font-medium transition-colors">
+              <Download size={14} />
+              <span className="hidden sm:inline">{exportFlash ? 'Downloaded!' : 'Download decks.js'}</span>
+            </button>
+            <button onClick={newDeck}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500
+                text-white text-sm font-semibold transition-colors">
+              <Plus size={16} /> New Deck
+            </button>
           </div>
         </div>
+
+        {!ghToken && (
+          <div className="mb-4 p-3 rounded-xl bg-yellow-500/8 border border-yellow-500/20 text-yellow-400 text-sm flex items-center gap-3">
+            <Github size={14} className="shrink-0" />
+            <span>Connect your <button onClick={() => setShowGhSettings(true)} className="underline font-medium">GitHub token</button> to upload images directly from the admin.</span>
+          </div>
+        )}
+
+        <div className="mb-4 p-3 rounded-xl bg-blue-500/8 border border-blue-500/15 text-blue-300 text-sm">
+          <strong>Deploy:</strong> Edit → Save → <em>Download decks.js</em> → replace <code className="bg-black/30 px-1 rounded text-blue-200">src/data/decks.js</code> → <code className="bg-black/30 px-1 rounded text-blue-200">git push</code>
+        </div>
+
+        <div className="space-y-2">
+          {deckList.map((deck, idx) => (
+            <div key={deck.id}
+              className="flex items-center gap-4 p-4 rounded-2xl bg-white/3 border border-white/8
+                hover:border-white/15 transition-colors group">
+              <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0"
+                style={{ background: `linear-gradient(135deg, ${deck.gradientFrom}, ${deck.gradientTo})` }}>
+                {deck.image && <img src={deck.image} alt="" className="w-full h-full object-contain" />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-white truncate">{deck.name || 'Untitled'}</div>
+                <div className="text-xs text-gray-500 mt-0.5 flex flex-wrap gap-2">
+                  <span>{deck.commander || '—'}</span>
+                  <span className="text-gray-700">·</span>
+                  <span>B{deck.bracket}</span>
+                  <span className="text-gray-700">·</span>
+                  <span>${deck.price}</span>
+                  <span className="text-gray-700">·</span>
+                  <span>Qty: {deck.quantity ?? '—'}</span>
+                </div>
+              </div>
+              <div className="hidden sm:flex gap-1">
+                {deck.colors.map(c => <span key={c} className="w-3 h-3 rounded-full" style={{ background: colorMeta[c]?.hex }} />)}
+              </div>
+              <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${deck.featured ? 'bg-yellow-500/20 text-yellow-400' : 'bg-white/5 text-gray-600'}`}>
+                {deck.featured ? 'Featured' : 'Hidden'}
+              </span>
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onClick={() => moveDeck(deck.id, -1)} disabled={idx === 0}
+                  className="p-1.5 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white disabled:opacity-20 transition-colors">
+                  <ChevronUp size={13} />
+                </button>
+                <button onClick={() => moveDeck(deck.id, 1)} disabled={idx === deckList.length - 1}
+                  className="p-1.5 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white disabled:opacity-20 transition-colors">
+                  <ChevronDown size={13} />
+                </button>
+                <button onClick={() => editDeck(deck)}
+                  className="p-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors ml-1">
+                  <Edit2 size={13} />
+                </button>
+                <button onClick={() => deleteDeck(deck.id)}
+                  className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors">
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    );
-  }
+    </div>
+  );
 
-  // ── Render: Edit view ───────────────────────────────────────────────────────
+  // ── Edit view ────────────────────────────────────────────────────────────────
   const ac = editing.accentColor;
-
   return (
     <div className="min-h-screen bg-[#0a0e1a] pt-20 pb-20">
+      {showGhSettings && (
+        <GitHubSettings token={ghToken} onSave={setGhToken} onClose={() => setShowGhSettings(false)} />
+      )}
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-
         {/* Edit header */}
         <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => setEditing(null)}
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
-          >
+          <button onClick={() => setEditing(null)}
+            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm">
             <X size={14} /> Back to list
           </button>
-          <div className="flex gap-3">
-            <button
-              onClick={downloadDecksJs}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10
-                text-gray-300 hover:text-white text-sm font-medium transition-colors"
-            >
+          <div className="flex gap-2">
+            <button onClick={() => setShowGhSettings(true)}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 border border-white/10
+                text-gray-400 hover:text-white text-sm transition-colors">
+              <Github size={14} /> {ghToken ? 'GitHub ✓' : 'GitHub'}
+            </button>
+            <button onClick={downloadDecksJs}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10
+                text-gray-300 hover:text-white text-sm font-medium transition-colors">
               <Download size={14} /> Download decks.js
             </button>
-            <button
-              onClick={saveDeck}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold transition-all"
-              style={{ background: savedFlash ? '#22c55e' : '#2563eb' }}
-            >
+            <button onClick={saveDeck}
+              className="flex items-center gap-2 px-5 py-2 rounded-xl text-white text-sm font-semibold transition-all"
+              style={{ background: savedFlash ? '#22c55e' : '#2563eb' }}>
               {savedFlash ? <><Check size={14} /> Saved!</> : 'Save Deck'}
             </button>
           </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
-
-          {/* ── Left: Preview + Inventory ─────────────────────────────────── */}
+          {/* Left: Preview + Inventory */}
           <div className="lg:col-span-1 space-y-4">
-            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Live Preview</div>
-
-            {/* Card preview */}
-            <div
-              className="rounded-2xl overflow-hidden border border-white/8"
-              style={{ boxShadow: `0 8px 32px ${ac}33, 0 0 0 1px ${ac}22` }}
-            >
-              <div
-                className="relative aspect-square w-full overflow-hidden"
-                style={{ background: `linear-gradient(135deg, ${editing.gradientFrom}, ${editing.gradientTo})` }}
-              >
-                {editing.image ? (
-                  <img src={editing.image} alt={editing.name} className="absolute inset-0 w-full h-full object-contain" />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center opacity-10 text-6xl select-none">⚔</div>
-                )}
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Live Preview</p>
+            <div className="rounded-2xl overflow-hidden border border-white/8"
+              style={{ boxShadow: `0 8px 32px ${ac}33, 0 0 0 1px ${ac}22` }}>
+              <div className="relative aspect-square w-full overflow-hidden"
+                style={{ background: `linear-gradient(135deg, ${editing.gradientFrom}, ${editing.gradientTo})` }}>
+                {editing.image
+                  ? <img src={editing.image} alt={editing.name} className="absolute inset-0 w-full h-full object-contain" />
+                  : <div className="absolute inset-0 flex items-center justify-center text-6xl opacity-10 select-none">⚔</div>}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
                 <div className="absolute top-3 left-3">
                   <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-black/60 border border-white/10"
@@ -462,85 +657,59 @@ export default function Admin() {
                   ${editing.price}
                 </div>
                 <div className="absolute bottom-3 left-3 flex gap-1.5">
-                  {editing.colors.map(c => (
-                    <span key={c} className="w-4 h-4 rounded-full border border-white/20" style={{ background: colorMeta[c]?.hex }} />
-                  ))}
+                  {editing.colors.map(c => <span key={c} className="w-4 h-4 rounded-full border border-white/20" style={{ background: colorMeta[c]?.hex }} />)}
                 </div>
               </div>
-              <div className="p-4" style={{ background: '#0f1629' }}>
-                <div className="font-bold text-white mb-0.5 truncate">{editing.name || 'Deck Name'}</div>
-                <div className="text-xs text-gray-500 mb-2 truncate">{editing.commander || 'Commander name'}</div>
+              <div className="p-4 bg-[#0f1629]">
+                <div className="font-bold text-white truncate mb-0.5">{editing.name || 'Deck Name'}</div>
+                <div className="text-xs text-gray-500 mb-2 truncate">{editing.commander || 'Commander'}</div>
                 <div className="flex flex-wrap gap-1">
                   {editing.playstyles.slice(0, 3).map(t => (
                     <span key={t} className="text-xs px-2 py-0.5 rounded-full"
-                      style={{ background: `${ac}18`, color: ac, border: `1px solid ${ac}33` }}>
-                      {t}
-                    </span>
+                      style={{ background: `${ac}18`, color: ac, border: `1px solid ${ac}33` }}>{t}</span>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Inventory panel */}
+            {/* Inventory */}
             <div className="p-4 rounded-xl bg-white/3 border border-white/8 space-y-4">
-              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Inventory</div>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Inventory</p>
               <div>
                 <label className="block text-xs text-gray-500 mb-1.5">Quantity in Stock</label>
-                <input
-                  type="number" min="0"
-                  value={editing.quantity ?? 0}
+                <input type="number" min="0" value={editing.quantity ?? 0}
                   onChange={e => set('quantity', parseInt(e.target.value) || 0)}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
-                    focus:outline-none focus:border-blue-500 transition-colors"
-                />
+                    focus:outline-none focus:border-blue-500 transition-colors" />
               </div>
-              <Toggle
-                checked={editing.inStock !== false}
-                onChange={v => set('inStock', v)}
-                label="Show as In Stock"
-              />
-              <Toggle
-                checked={!!editing.featured}
-                onChange={v => set('featured', v)}
-                label="Featured (shows in hero)"
-              />
+              <Toggle checked={editing.inStock !== false} onChange={v => set('inStock', v)} label="Show as In Stock" />
+              <Toggle checked={!!editing.featured} onChange={v => set('featured', v)} label="Featured (hero & homepage)" />
             </div>
           </div>
 
-          {/* ── Right: Tabbed form ────────────────────────────────────────── */}
+          {/* Right: Form */}
           <div className="lg:col-span-2">
-            {/* Tabs */}
             <div className="flex border-b border-white/8 mb-6">
               {['Basic', 'Content', 'Decklist'].map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab.toLowerCase())}
+                <button key={tab} onClick={() => setActiveTab(tab.toLowerCase())}
                   className={`px-5 py-3 text-sm font-medium transition-colors ${
-                    activeTab === tab.toLowerCase()
-                      ? 'text-white border-b-2 border-blue-500'
-                      : 'text-gray-500 hover:text-gray-300'
-                  }`}
-                >
-                  {tab}
-                </button>
+                    activeTab === tab.toLowerCase() ? 'text-white border-b-2 border-blue-500' : 'text-gray-500 hover:text-gray-300'
+                  }`}>{tab}</button>
               ))}
             </div>
 
-            {/* ── Tab: Basic ─────────────────────────────────────────────── */}
+            {/* Basic tab */}
             {activeTab === 'basic' && (
               <div className="space-y-5">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <Field label="Deck Name" value={editing.name} onChange={v => set('name', v)} placeholder="e.g. Meren Graveyard Engine" />
                   <Field label="Commander" value={editing.commander} onChange={v => set('commander', v)} placeholder="e.g. Meren of Clan Nel Toth" />
                 </div>
-
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Price ($)</label>
-                    <input type="number" min="0" value={editing.price}
-                      onChange={e => set('price', parseInt(e.target.value) || 0)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
-                        focus:outline-none focus:border-blue-500 transition-colors" />
+                    <input type="number" min="0" value={editing.price} onChange={e => set('price', parseInt(e.target.value) || 0)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Bracket</label>
@@ -559,8 +728,7 @@ export default function Admin() {
                   <div>
                     <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Difficulty</label>
                     <select value={editing.difficulty} onChange={e => set('difficulty', e.target.value)}
-                      className="w-full h-[42px] bg-[#0a0e1a] border border-white/10 rounded-xl px-3 text-white text-sm
-                        focus:outline-none focus:border-blue-500">
+                      className="w-full h-[42px] bg-[#0a0e1a] border border-white/10 rounded-xl px-3 text-white text-sm focus:outline-none focus:border-blue-500">
                       {DIFFICULTY_OPTIONS.map(d => <option key={d}>{d}</option>)}
                     </select>
                   </div>
@@ -591,7 +759,7 @@ export default function Admin() {
                   <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Playstyles</label>
                   <div className="flex flex-wrap gap-2">
                     {playstyleMeta.map(tag => (
-                      <button key={tag} onClick={() => togglePlaystyle(tag)}
+                      <button key={tag} onClick={() => toggleStyle(tag)}
                         className="text-xs px-3 py-1.5 rounded-full border font-medium transition-all"
                         style={editing.playstyles.includes(tag)
                           ? { background: `${ac}22`, borderColor: `${ac}66`, color: ac }
@@ -602,78 +770,49 @@ export default function Admin() {
                   </div>
                 </div>
 
-                {/* Image */}
-                <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Image Filename</label>
-                  <div className="flex gap-2">
-                    <input
-                      value={imageFilename(editing.image)}
-                      onChange={e => set('image', e.target.value ? buildImagePath(e.target.value.trim()) : null)}
-                      placeholder="e.g. meren.png"
-                      className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
-                        placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors"
-                    />
-                    {editing.image && (
-                      <button onClick={() => set('image', null)}
-                        className="px-3 py-2 rounded-xl bg-red-500/10 text-red-400 text-xs hover:bg-red-500/20 transition-colors">
-                        Clear
-                      </button>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-600 mt-1">
-                    Copy your image to <code className="text-gray-500">public/images/</code> first, then enter the filename.
-                  </p>
-                </div>
+                {/* Image upload */}
+                <ImageUploader
+                  token={ghToken}
+                  currentImage={editing.image}
+                  onUploaded={(filename, previewUrl) => {
+                    set('image', previewUrl || buildImagePath(filename));
+                  }}
+                />
               </div>
             )}
 
-            {/* ── Tab: Content ───────────────────────────────────────────── */}
+            {/* Content tab */}
             {activeTab === 'content' && (
               <div className="space-y-4">
-                <TextArea label="Short Description" value={editing.description} onChange={v => set('description', v)} rows={2}
-                  placeholder="One-liner shown on the deck card" />
-                <TextArea label="Strategy" value={editing.strategy} onChange={v => set('strategy', v)} rows={4}
-                  placeholder="How the deck works overall" />
-                <TextArea label="How This Deck Wins" value={editing.wins} onChange={v => set('wins', v)} rows={3}
-                  placeholder="The win conditions" />
-                <TextArea label="Beginner Pilot Guide" value={editing.pilotGuide} onChange={v => set('pilotGuide', v)} rows={4}
-                  placeholder="How a new player should approach piloting this deck" />
-                <TextArea label="Opening Hand Tips" value={editing.openingHand} onChange={v => set('openingHand', v)} rows={3}
-                  placeholder="What to look for in your opening hand" />
-                <TextArea label="Upgrade Path" value={editing.upgradePath} onChange={v => set('upgradePath', v)} rows={3}
-                  placeholder="Suggested upgrades and why" />
-                <TextArea label="Tokens Needed" value={editing.tokensNeeded} onChange={v => set('tokensNeeded', v)} rows={2}
-                  placeholder="List the tokens this deck creates" />
+                <TextArea label="Short Description" value={editing.description} onChange={v => set('description', v)} rows={2} placeholder="One-liner shown on the card" />
+                <TextArea label="Strategy" value={editing.strategy} onChange={v => set('strategy', v)} rows={4} placeholder="How the deck works overall" />
+                <TextArea label="How This Deck Wins" value={editing.wins} onChange={v => set('wins', v)} rows={3} />
+                <TextArea label="Beginner Pilot Guide" value={editing.pilotGuide} onChange={v => set('pilotGuide', v)} rows={4} />
+                <TextArea label="Opening Hand Tips" value={editing.openingHand} onChange={v => set('openingHand', v)} rows={3} />
+                <TextArea label="Upgrade Path" value={editing.upgradePath} onChange={v => set('upgradePath', v)} rows={3} />
+                <TextArea label="Tokens Needed" value={editing.tokensNeeded} onChange={v => set('tokensNeeded', v)} rows={2} />
               </div>
             )}
 
-            {/* ── Tab: Decklist ──────────────────────────────────────────── */}
+            {/* Decklist tab */}
             {activeTab === 'decklist' && (
               <div className="space-y-4">
-                <p className="text-xs text-gray-500">One card per line per section. Section name can include count, e.g. <code className="text-gray-400">Creatures (28)</code>.</p>
+                <p className="text-xs text-gray-500">One card per line per section.</p>
                 {editing.fullDecklist.map((section, i) => (
                   <div key={i} className="p-4 rounded-xl bg-white/3 border border-white/8">
                     <div className="flex items-center gap-2 mb-3">
-                      <input
-                        value={section.section}
-                        onChange={e => updateSection(i, 'section', e.target.value)}
+                      <input value={section.section} onChange={e => updateSection(i, 'section', e.target.value)}
                         className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-sm
-                          font-medium focus:outline-none focus:border-blue-500 transition-colors"
-                        placeholder="Section name"
-                      />
+                          font-medium focus:outline-none focus:border-blue-500 transition-colors" placeholder="Section name" />
                       <button onClick={() => removeSection(i)}
                         className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors">
                         <Trash2 size={12} />
                       </button>
                     </div>
-                    <textarea
-                      value={section.cards.join('\n')}
-                      onChange={e => setSectionCards(i, e.target.value)}
-                      rows={Math.max(4, section.cards.length + 2)}
-                      placeholder="One card per line..."
+                    <textarea value={section.cards.join('\n')} onChange={e => setSectionCards(i, e.target.value)}
+                      rows={Math.max(4, section.cards.length + 2)} placeholder="One card per line…"
                       className="w-full bg-[#0a0e1a] border border-white/8 rounded-lg px-3 py-2.5 text-gray-300 text-sm
-                        font-mono leading-relaxed focus:outline-none focus:border-blue-500 resize-none transition-colors"
-                    />
+                        font-mono leading-relaxed focus:outline-none focus:border-blue-500 resize-none transition-colors" />
                     <div className="text-xs text-gray-600 mt-1">{section.cards.length} cards</div>
                   </div>
                 ))}

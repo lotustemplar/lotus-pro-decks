@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Zap, ZapOff } from 'lucide-react';
 
+const LOGO_SRC = `${import.meta.env.BASE_URL}images/logo.png`;
+
 const links = [
   { to: '/', label: 'Home' },
   { to: '/shop', label: 'Shop Decks' },
@@ -38,18 +40,11 @@ export default function Nav({ animationsEnabled, setAnimationsEnabled }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="relative w-9 h-9">
-              <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 animate-pulse-glow" />
-              <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <span className="text-white font-bold text-lg font-display">P</span>
-              </div>
-            </div>
-            <div>
-              <span className="font-display font-bold text-lg text-white leading-none tracking-wide group-hover:text-blue-400 transition-colors">
-                ProPilot
-              </span>
-              <span className="block text-[10px] text-blue-400 leading-none tracking-widest uppercase">Decks</span>
-            </div>
+            <img
+              src={LOGO_SRC}
+              alt="ProPilot Decks"
+              className="h-10 w-auto object-contain group-hover:opacity-90 transition-opacity"
+            />
           </Link>
 
           {/* Desktop links */}
