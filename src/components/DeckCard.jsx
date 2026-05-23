@@ -3,14 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Star, Zap, ChevronRight } from 'lucide-react';
 import ElementalOverlay from './ElementalOverlay';
+import DifficultyMeter from './DifficultyMeter';
 import { colorMeta } from '../data/decks';
-
-const DIFFICULTY_COLOR = {
-  Beginner: 'text-green-400 bg-green-400/10 border-green-400/30',
-  Easy: 'text-cyan-400 bg-cyan-400/10 border-cyan-400/30',
-  Moderate: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30',
-  Advanced: 'text-red-400 bg-red-400/10 border-red-400/30',
-};
 
 const BRACKET_COLOR = {
   2: 'text-green-400',
@@ -135,13 +129,11 @@ export default function DeckCard({ deck, animationsEnabled }) {
 
         {/* Card body */}
         <div className="p-4">
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <h3 className="font-display font-bold text-lg text-white leading-tight group-hover:text-blue-300 transition-colors">
+          <div className="mb-1">
+            <h3 className="font-display font-bold text-lg text-white leading-tight group-hover:text-blue-300 transition-colors mb-2">
               {deck.name}
             </h3>
-            <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full border ${DIFFICULTY_COLOR[deck.difficulty]}`}>
-              {deck.difficulty}
-            </span>
+            <DifficultyMeter value={deck.difficulty} variant="compact" />
           </div>
 
           <p className="text-xs text-gray-500 mb-2 font-medium">Commander: {deck.commander}</p>

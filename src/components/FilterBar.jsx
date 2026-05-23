@@ -3,7 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SlidersHorizontal, X, ChevronDown } from 'lucide-react';
 import { colorMeta, playstyleMeta } from '../data/decks';
 
-const DIFFICULTIES = ['Beginner', 'Intermediate', 'Advanced'];
+const DIFFICULTY_RANGES = [
+  { value: 'casual',   label: 'Casual (0–4)',    min: 0,   max: 4   },
+  { value: 'focused',  label: 'Focused (4–6.5)', min: 4,   max: 6.5 },
+  { value: 'advanced', label: 'Advanced (6.5+)', min: 6.5, max: 10  },
+];
 const BRACKETS = [2, 3, 4];
 const SORT_OPTIONS = [
   { value: 'featured', label: 'Featured' },
@@ -113,7 +117,7 @@ export default function FilterBar({ filters, onChange, resultCount }) {
       {/* Difficulty */}
       <FilterSection title="Difficulty">
         <MultiToggle
-          options={DIFFICULTIES}
+          options={DIFFICULTY_RANGES.map(r => ({ value: r.value, label: r.label }))}
           selected={filters.difficulties}
           onChange={difficulties => onChange({ difficulties })}
         />

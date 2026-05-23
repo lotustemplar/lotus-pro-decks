@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import Hero from '../components/Hero';
 import ColorFilter from '../components/ColorFilter';
-import DeckCard from '../components/DeckCard';
+import DeckCarousel from '../components/DeckCarousel';
 import WhyProPilot from '../components/WhyProPilot';
 import BracketSection from '../components/BracketSection';
 import CTASection from '../components/CTASection';
@@ -20,13 +20,13 @@ export default function Home({ animationsEnabled }) {
           ? d.colors.length > 1
           : d.colors.includes(selectedColor)
       )
-    : decks.filter(d => d.featured).slice(0, 3);
+    : decks;
 
   return (
     <div>
       <Hero animationsEnabled={animationsEnabled} />
 
-      {/* Color Filter + Featured Decks */}
+      {/* Color Filter + Deck Carousel */}
       <section className="py-20 bg-[#0a0e1a] relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {/* Section header */}
@@ -56,46 +56,55 @@ export default function Home({ animationsEnabled }) {
               transition={{ delay: 0.2 }}
               className="text-gray-400 max-w-lg mx-auto mb-8"
             >
-              Every deck color has its own personality. Pick the energy that matches yours.
+              Every deck has its own personality. Use the color filter to find what suits you.
             </motion.p>
 
             <ColorFilter selected={selectedColor} onChange={setSelectedColor} />
 
-            {selectedColor && (
+            <AnimatePresence>
+              {selectedColor && (
+                <motion.div
+                  key={selectedColor}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  className="mt-4 text-sm text-gray-400"
+                >
+                  Showing <span className="font-semibold" style={{ color: colorMeta[selectedColor]?.hex }}>
+                    {colorMeta[selectedColor]?.label}
+                  </span> decks — {colorMeta[selectedColor]?.desc}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Carousel */}
+          <div className="px-6 sm:px-8">
+            {filtered.length > 0 ? (
+              <DeckCarousel
+                decks={filtered}
+                animationsEnabled={animationsEnabled}
+              />
+            ) : (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-4 text-sm text-gray-400"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-16 text-gray-500"
               >
-                Showing <span className="font-semibold" style={{ color: colorMeta[selectedColor]?.hex }}>
-                  {colorMeta[selectedColor]?.label}
-                </span> decks — {colorMeta[selectedColor]?.desc}
+                No decks found for this color combination yet.
               </motion.div>
             )}
           </div>
 
-          {/* Deck cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filtered.length > 0 ? (
-              filtered.map(deck => (
-                <DeckCard key={deck.id} deck={deck} animationsEnabled={animationsEnabled} />
-              ))
-            ) : (
-              <div className="col-span-3 text-center py-12 text-gray-500">
-                No decks found for this color combination yet.
-              </div>
-            )}
-          </div>
-
           {/* See all link */}
-          <div className="text-center mt-10">
+          <div className="text-center mt-12">
             <Link
               to="/shop"
               className="group inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm
                 border border-white/15 text-gray-300 hover:text-white hover:bg-white/5 hover:border-white/25
                 transition-all duration-200"
             >
-              Browse All Commander Decks
+              Browse Full Shop with Filters
               <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>

@@ -39,7 +39,7 @@ const MTG_COLORS = [
   { key: 'green',     symbol: 'G', hex: '#22c55e' },
   { key: 'colorless', symbol: '◇', hex: '#9ca3af' },
 ];
-const DIFFICULTY_OPTIONS = ['Beginner', 'Intermediate', 'Advanced'];
+// Difficulty is now a 0–10 numeric scale (step 0.5)
 const REPO_OWNER = 'lotustemplar';
 const REPO_NAME  = 'propilot-decks';
 
@@ -131,7 +131,7 @@ function generateDecksJs(deckList) {
     bracket: ${deck.bracket},
     colors: ${JSON.stringify(deck.colors)},
     colorLabel: ${JSON.stringify(deck.colorLabel)},
-    difficulty: ${JSON.stringify(deck.difficulty)},
+    difficulty: ${typeof deck.difficulty === 'number' ? deck.difficulty : JSON.stringify(deck.difficulty)},
     playstyles: ${JSON.stringify(deck.playstyles)},
     description: ${JSON.stringify(deck.description || '')},
     image: ${imageStr},
@@ -173,7 +173,7 @@ export const playstyleMeta = [
 
 const BLANK_DECK = {
   name: '', commander: '', price: 149, bracket: 2,
-  colors: [], colorLabel: '', difficulty: 'Easy', playstyles: [],
+  colors: [], colorLabel: '', difficulty: 5, playstyles: [],
   description: '', image: null,
   accentColor: '#6366f1', gradientFrom: '#0a0a1a', gradientTo: '#1a0a1a', glowClass: 'glow-purple',
   strategy: '', wins: '', pilotGuide: '', openingHand: '', upgradePath: '', tokensNeeded: '',
@@ -962,11 +962,21 @@ export default function Admin() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Difficulty</label>
-                    <select value={editing.difficulty} onChange={e => set('difficulty', e.target.value)}
-                      className="w-full h-[42px] bg-[#0a0e1a] border border-white/10 rounded-xl px-3 text-white text-sm focus:outline-none focus:border-blue-500">
-                      {DIFFICULTY_OPTIONS.map(d => <option key={d}>{d}</option>)}
-                    </select>
+                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">
+                      Difficulty — <span style={{ color: editing.difficulty <= 3 ? '#22c55e' : editing.difficulty <= 5 ? '#84cc16' : editing.difficulty <= 6.5 ? '#f59e0b' : editing.difficulty <= 8 ? '#f97316' : '#ef4444' }}>
+                        {editing.difficulty}/10 &nbsp;
+                        {editing.difficulty <= 2 ? 'Casual' : editing.difficulty <= 4 ? 'Beginner' : editing.difficulty <= 6 ? 'Focused' : editing.difficulty <= 7.5 ? 'Advanced' : 'Expert'}
+                      </span>
+                    </label>
+                    <input
+                      type="range" min={0} max={10} step={0.5}
+                      value={editing.difficulty}
+                      onChange={e => set('difficulty', Number(e.target.value))}
+                      className="w-full accent-blue-500"
+                    />
+                    <div className="flex justify-between text-[10px] text-gray-600 mt-0.5 select-none">
+                      <span>0 Casual</span><span>5 Focused</span><span>10 Expert</span>
+                    </div>
                   </div>
                 </div>
 

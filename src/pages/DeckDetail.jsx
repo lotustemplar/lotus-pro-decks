@@ -4,15 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ShoppingCart, ChevronDown, ChevronUp, Star } from 'lucide-react';
 import { decks, colorMeta } from '../data/decks';
 import ElementalOverlay from '../components/ElementalOverlay';
+import DifficultyMeter from '../components/DifficultyMeter';
 
 const TABS = ['Strategy', 'Decklist', 'How to Pilot', 'Upgrade Path', 'Tokens'];
-
-const DIFFICULTY_COLOR = {
-  Beginner: '#22c55e',
-  Easy: '#06b6d4',
-  Moderate: '#f59e0b',
-  Advanced: '#ef4444',
-};
 
 const TRUST_BADGES = [
   { icon: '🛡️', label: 'Professionally Built' },
@@ -164,19 +158,16 @@ export default function DeckDetail({ animationsEnabled }) {
               <div className="flex flex-wrap items-center gap-2 mb-2">
                 {deck.colors.map(c => <ColorDot key={c} color={c} />)}
                 <span className="text-sm text-gray-400">{deck.colorLabel}</span>
-                <span
-                  className="text-xs px-2 py-0.5 rounded-full border"
-                  style={{
-                    color: DIFFICULTY_COLOR[deck.difficulty],
-                    borderColor: `${DIFFICULTY_COLOR[deck.difficulty]}44`,
-                    background: `${DIFFICULTY_COLOR[deck.difficulty]}11`,
-                  }}
-                >
-                  {deck.difficulty}
-                </span>
               </div>
               <h1 className="text-3xl sm:text-4xl font-display font-bold text-white mb-1">{deck.name}</h1>
               <p className="text-gray-400 mb-3">Commander: <span className="text-gray-200 font-medium">{deck.commander}</span></p>
+
+              {/* Difficulty meter */}
+              <div className="mb-4 max-w-xs">
+                <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1.5">Difficulty</p>
+                <DifficultyMeter value={deck.difficulty} variant="full" />
+              </div>
+
               <div className="flex flex-wrap gap-1.5">
                 {deck.playstyles.map(tag => (
                   <span

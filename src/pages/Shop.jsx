@@ -27,7 +27,17 @@ function applyFilters(allDecks, filters) {
     );
   }
   if (filters.difficulties.length) {
-    result = result.filter(d => filters.difficulties.includes(d.difficulty));
+    const RANGES = {
+      casual:   { min: 0,   max: 4   },
+      focused:  { min: 4,   max: 6.5 },
+      advanced: { min: 6.5, max: 10  },
+    };
+    result = result.filter(d =>
+      filters.difficulties.some(key => {
+        const r = RANGES[key];
+        return r && d.difficulty >= r.min && d.difficulty <= r.max;
+      })
+    );
   }
   if (filters.brackets.length) {
     result = result.filter(d => filters.brackets.includes(d.bracket));
