@@ -37,7 +37,7 @@ const MTG_COLORS = [
   { key: 'red',   symbol: 'R', hex: '#ef4444' },
   { key: 'green', symbol: 'G', hex: '#22c55e' },
 ];
-const DIFFICULTY_OPTIONS = ['Beginner', 'Easy', 'Moderate', 'Advanced'];
+const DIFFICULTY_OPTIONS = ['Beginner', 'Intermediate', 'Advanced'];
 const REPO_OWNER = 'lotustemplar';
 const REPO_NAME  = 'propilot-decks';
 
@@ -795,7 +795,7 @@ export default function Admin() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
                 <div className="absolute top-3 left-3">
                   <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-black/60 border border-white/10"
-                    style={{ color: editing.bracket === 2 ? '#4ade80' : editing.bracket === 3 ? '#facc15' : '#f87171' }}>
+                    style={{ color: editing.bracket === 2 ? '#4ade80' : editing.bracket === 3 ? '#facc15' : editing.bracket === 4 ? '#ef4444' : '#f87171' }}>
                     Bracket {editing.bracket}
                   </span>
                 </div>

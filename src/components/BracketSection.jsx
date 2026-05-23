@@ -9,7 +9,7 @@ const BRACKETS = [
     desc: 'Casual, affordable, beginner-friendly decks designed for fun and learning. These decks are powered enough to compete but fair enough that everyone at the table has a good time.',
     traits: ['Budget-conscious builds', 'Slower win conditions', 'Great for learning', 'Low power level', 'Any playgroup welcomes these'],
     icon: '🌱',
-    example: 'Krenko Goblin Blitz, Rhys Token Swarm, Liesa Lifegain Control',
+    example: 'Krenko Goblin Blitz, Rhys Token Swarm, Teysa Clue Aristocrats',
   },
   {
     num: 3,
@@ -20,6 +20,16 @@ const BRACKETS = [
     traits: ['Premium card choices', 'Tight synergy packages', 'Clear win conditions', 'Competitive casual ready', 'More explosive turns'],
     icon: '⚡',
     example: 'Meren Graveyard Engine, Elsha Storm Cannon, Atraxa Proliferate',
+  },
+  {
+    num: 4,
+    title: 'Bracket 4',
+    subtitle: 'Competitive & Premium',
+    color: '#ef4444',
+    desc: 'High-powered, tournament-tuned decks built to dominate. These are for experienced players who know the game inside and out and want to play at the highest casual level.',
+    traits: ['Optimized card selections', 'Fast and consistent engines', 'Multiple win conditions', 'Handles interaction well', 'For seasoned players only'],
+    icon: '🔥',
+    example: 'Coming soon — premium competitive builds',
   },
 ];
 
@@ -68,12 +78,12 @@ export default function BracketSection() {
           </motion.p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {BRACKETS.map((bracket, i) => (
             <motion.div
               key={bracket.num}
-              initial={{ opacity: 0, x: i === 0 ? -30 : 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="relative glass rounded-2xl p-6 border border-white/8 group hover:-translate-y-1 transition-all duration-300"
@@ -134,7 +144,7 @@ export default function BracketSection() {
         >
           <div className="text-sm text-gray-400 leading-relaxed">
             <span className="text-white font-semibold">Not sure which bracket is right for you?</span>
-            {' '}Ask your playgroup! Bracket 2 is perfect if you've never played before, or if your group plays casual kitchen-table Commander. Bracket 3 is ideal once you're comfortable with the basics and want a more focused, synergistic experience.
+            {' '}Ask your playgroup! <span className="text-green-400 font-medium">Bracket 2</span> is perfect if you're newer to Commander or play casual kitchen-table games. <span className="text-yellow-400 font-medium">Bracket 3</span> is ideal once you're comfortable and want a focused, synergistic experience. <span className="text-red-400 font-medium">Bracket 4</span> is our premium tier — for experienced players ready to compete.
           </div>
         </motion.div>
       </div>

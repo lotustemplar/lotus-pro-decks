@@ -3,14 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SlidersHorizontal, X, ChevronDown } from 'lucide-react';
 import { colorMeta, playstyleMeta } from '../data/decks';
 
-const DIFFICULTIES = ['Beginner', 'Easy', 'Moderate'];
-const BRACKETS = [2, 3];
+const DIFFICULTIES = ['Beginner', 'Intermediate', 'Advanced'];
+const BRACKETS = [2, 3, 4];
 const SORT_OPTIONS = [
   { value: 'featured', label: 'Featured' },
   { value: 'price-asc', label: 'Price: Low → High' },
   { value: 'price-desc', label: 'Price: High → Low' },
-  { value: 'bracket-asc', label: 'Bracket: 2 → 3' },
-  { value: 'bracket-desc', label: 'Bracket: 3 → 2' },
+  { value: 'bracket-asc', label: 'Bracket: Low → High' },
+  { value: 'bracket-desc', label: 'Bracket: High → Low' },
 ];
 
 function FilterSection({ title, children, defaultOpen = true }) {
