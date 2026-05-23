@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import FilterBar from '../components/FilterBar';
 import DeckGrid from '../components/DeckGrid';
+import SurpriseBanner from '../components/SurpriseBanner';
 import { decks } from '../data/decks';
 import { Link } from 'react-router-dom';
 
@@ -89,6 +90,9 @@ export default function Shop({ animationsEnabled }) {
           >
             Every deck is professionally built, synergy-checked, and includes a complete pilot guide so you can start playing immediately.
           </motion.p>
+          <div className="flex justify-center">
+            <SurpriseBanner variant="header" />
+          </div>
         </div>
       </div>
 

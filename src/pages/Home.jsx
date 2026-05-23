@@ -8,6 +8,7 @@ import DeckCard from '../components/DeckCard';
 import WhyProPilot from '../components/WhyProPilot';
 import BracketSection from '../components/BracketSection';
 import CTASection from '../components/CTASection';
+import SurpriseBanner from '../components/SurpriseBanner';
 import { decks, colorMeta } from '../data/decks';
 
 export default function Home({ animationsEnabled }) {
@@ -101,6 +102,7 @@ export default function Home({ animationsEnabled }) {
         </div>
       </section>
 
+      <SurpriseBanner variant="section" />
       <WhyProPilot />
       <BracketSection />
       <CTASection animationsEnabled={animationsEnabled} />
