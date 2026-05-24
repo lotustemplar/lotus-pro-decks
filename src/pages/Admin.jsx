@@ -149,6 +149,7 @@ function generateDecksJs(deckList) {
     included: [${included}],
     featured: ${!!deck.featured},
     quantity: ${deck.quantity ?? 10},
+    stripePrice: ${JSON.stringify(deck.stripePrice || '')},
   }`;
   }).join(',\n');
 
@@ -184,7 +185,7 @@ const BLANK_DECK = {
     { section: 'Lands (36)', cards: [] },
   ],
   included: ['99-card Commander deck', 'Pilot guide booklet', 'Synergy cheat sheet', 'Upgrade path guide', 'Storage sleeve set'],
-  featured: false, quantity: 10,
+  featured: false, quantity: 10, stripePrice: '',
 };
 
 // ─── Small UI helpers ─────────────────────────────────────────────────────────
@@ -616,17 +617,48 @@ export default function Admin() {
     set('playstyles', editing.playstyles.includes(t) ? editing.playstyles.filter(x => x !== t) : [...editing.playstyles, t]);
   }
   async function saveDeck() {
-    const exists = deckList.some(d => d.id === editing.id);
+    setPushStatus('pushing'); setPushError('');
+
+    // ── 1. Sync with Stripe (non-fatal if it fails) ──────────────────────────
+    let finalDeck = { ...editing };
+    try {
+      const stripeRes = await fetch('/api/create-stripe-product', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          deckId:        String(editing.id),
+          name:          editing.name || 'Untitled Deck',
+          description:   editing.description || '',
+          priceInCents:  Math.round((editing.price || 0) * 100),
+          commander:     editing.commander || '',
+          bracket:       editing.bracket,
+          colors:        editing.colors,
+        }),
+      });
+      if (stripeRes.ok) {
+        const { priceId } = await stripeRes.json();
+        finalDeck = { ...finalDeck, stripePrice: priceId };
+      } else {
+        const errBody = await stripeRes.json().catch(() => ({}));
+        console.warn('[Admin] Stripe sync non-OK:', stripeRes.status, errBody.error);
+      }
+    } catch (err) {
+      console.warn('[Admin] Stripe sync failed (non-fatal):', err.message);
+    }
+
+    // ── 2. Update local / localStorage state ────────────────────────────────
+    setEditing(finalDeck);
+    const exists = deckList.some(d => d.id === finalDeck.id);
     const next = exists
-      ? deckList.map(d => d.id === editing.id ? editing : d)
-      : [...deckList, editing];
+      ? deckList.map(d => d.id === finalDeck.id ? finalDeck : d)
+      : [...deckList, finalDeck];
     setDeckList(next);
     setSaved(true); setTimeout(() => setSaved(false), 2000);
 
-    console.log('[Admin] saveDeck — ghToken present:', !!ghToken, 'length:', ghToken?.length);
+    console.log('[Admin] saveDeck — ghToken present:', !!ghToken, 'stripePrice:', finalDeck.stripePrice);
 
+    // ── 3. Push decks.js to GitHub ───────────────────────────────────────────
     if (ghToken) {
-      setPushStatus('pushing'); setPushError('');
       try {
         await pushDecksJs(next, ghToken);
         setPushStatus('done'); setTimeout(() => setPushStatus('idle'), 5000);
