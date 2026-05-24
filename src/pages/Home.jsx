@@ -29,7 +29,7 @@ export default function Home({ animationsEnabled }) {
       {/* Full-page logo wallpaper — fixed so it persists as you scroll */}
       <div
         className="fixed inset-0 flex items-center justify-center pointer-events-none select-none"
-        style={{ zIndex: 0 }}
+        style={{ zIndex: 2 }}
       >
         <img
           src={LOGO_SRC}
