@@ -11,6 +11,8 @@ import CTASection from '../components/CTASection';
 import SurpriseBanner from '../components/SurpriseBanner';
 import { decks, colorMeta } from '../data/decks';
 
+const LOGO_SRC = `${import.meta.env.BASE_URL}images/logo.png`;
+
 export default function Home({ animationsEnabled }) {
   const [selectedColor, setSelectedColor] = useState(null);
 
@@ -24,6 +26,20 @@ export default function Home({ animationsEnabled }) {
 
   return (
     <div>
+      {/* Full-page logo wallpaper — fixed so it persists as you scroll */}
+      <div
+        className="fixed inset-0 flex items-center justify-center pointer-events-none select-none"
+        style={{ zIndex: 0 }}
+      >
+        <img
+          src={LOGO_SRC}
+          alt=""
+          aria-hidden="true"
+          className="w-[900px] max-w-[80vw]"
+          style={{ opacity: 0.07, mixBlendMode: 'screen' }}
+        />
+      </div>
+
       <Hero animationsEnabled={animationsEnabled} />
 
       {/* Color Filter + Deck Carousel */}
