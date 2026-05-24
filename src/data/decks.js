@@ -3,7 +3,7 @@ export const decks = [
     id: 1,
     name: "Meren Graveyard Engine",
     commander: "Meren of Clan Nel Toth",
-    price: 78,
+    price: 79,
     bracket: 2,
     colors: ["black","green"],
     colorLabel: "Black / Green",
@@ -37,7 +37,7 @@ export const decks = [
     included: ["99-card Commander deck", "Pilot guide booklet", "Strategy card", "Synergy cheat sheet", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
     quantity: 1,
-    stripePrice: "price_1TalvP2iRe5T5JCTmMa0tJxE",
+    stripePrice: "price_1Talvd2iRe5T5JCTuJhZW0ha",
     ourCost: 47,
   },
   {
