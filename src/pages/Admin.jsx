@@ -150,6 +150,7 @@ function generateDecksJs(deckList) {
     featured: ${!!deck.featured},
     quantity: ${deck.quantity ?? 10},
     stripePrice: ${JSON.stringify(deck.stripePrice || '')},
+    ourCost: ${deck.ourCost ?? 0},
   }`;
   }).join(',\n');
 
@@ -185,7 +186,7 @@ const BLANK_DECK = {
     { section: 'Lands (36)', cards: [] },
   ],
   included: ['99-card Commander deck', 'Pilot guide booklet', 'Synergy cheat sheet', 'Upgrade path guide', 'Storage sleeve set'],
-  featured: false, quantity: 10, stripePrice: '',
+  featured: false, quantity: 10, stripePrice: '', ourCost: 0,
 };
 
 // ─── Small UI helpers ─────────────────────────────────────────────────────────
@@ -578,6 +579,7 @@ export default function Admin() {
   // push status: 'idle' | 'pushing' | 'done' | 'error'
   const [pushStatus, setPushStatus] = useState('idle');
   const [pushError,  setPushError]  = useState('');
+  const [marginPct,  setMarginPct]  = useState(40);
 
   useEffect(() => { localStorage.setItem('adminDecks', JSON.stringify(deckList)); }, [deckList]);
   useEffect(() => { localStorage.setItem('admin_gh_token', ghToken); }, [ghToken]);
@@ -1010,6 +1012,71 @@ export default function Admin() {
                       <span>0 Casual</span><span>5 Focused</span><span>10 Expert</span>
                     </div>
                   </div>
+                </div>
+
+                {/* Cost & Margin Calculator */}
+                <div className="p-4 rounded-xl bg-white/3 border border-white/8 space-y-4">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Cost &amp; Margin Calculator</p>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {/* Our Cost */}
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1.5">Our Cost ($)</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
+                        <input
+                          type="number" min="0" step="0.01"
+                          value={editing.ourCost ?? 0}
+                          onChange={e => set('ourCost', parseFloat(e.target.value) || 0)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl pl-7 pr-3 py-2.5 text-white text-sm
+                            focus:outline-none focus:border-purple-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+                    {/* Margin slider */}
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1.5">
+                        Target Margin —{' '}
+                        <span className="text-white font-semibold">{marginPct}%</span>
+                        <span className="text-gray-600 ml-2">({(100 / (100 - marginPct)).toFixed(2)}× markup)</span>
+                      </label>
+                      <input
+                        type="range" min={0} max={90} step={1}
+                        value={marginPct}
+                        onChange={e => setMarginPct(Number(e.target.value))}
+                        className="w-full accent-purple-500 mt-1.5"
+                      />
+                      <div className="flex justify-between text-[10px] text-gray-600 mt-0.5 select-none">
+                        <span>0%</span><span>45%</span><span>90%</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Result */}
+                  {(editing.ourCost ?? 0) > 0 ? (() => {
+                    const suggested = editing.ourCost / (1 - marginPct / 100);
+                    const profit    = suggested - editing.ourCost;
+                    return (
+                      <div className="flex items-center justify-between gap-4 p-3 rounded-xl bg-purple-500/8 border border-purple-500/20">
+                        <div>
+                          <div className="text-[11px] text-gray-500 mb-0.5">Suggested selling price</div>
+                          <div className="text-2xl font-bold text-white">${suggested.toFixed(2)}</div>
+                          <div className="text-[11px] text-gray-500 mt-0.5">
+                            Profit: <span className="text-green-400 font-medium">${profit.toFixed(2)}</span>
+                            &nbsp;·&nbsp; {marginPct}% gross margin
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => set('price', Math.round(suggested))}
+                          className="shrink-0 px-4 py-2 rounded-xl text-sm font-semibold text-white
+                            bg-purple-600 hover:bg-purple-500 transition-colors"
+                        >
+                          Apply ↑
+                        </button>
+                      </div>
+                    );
+                  })() : (
+                    <p className="text-xs text-gray-600">Enter your cost above to see the suggested selling price.</p>
+                  )}
                 </div>
 
                 {/* Color identity */}
