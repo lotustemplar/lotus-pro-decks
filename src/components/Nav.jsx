@@ -20,7 +20,7 @@ export default function Nav({ animationsEnabled, setAnimationsEnabled }) {
   const location = useLocation();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -37,13 +37,13 @@ export default function Nav({ animationsEnabled, setAnimationsEnabled }) {
           scrolled ? 'bg-[#020817]/95 backdrop-blur-xl shadow-2xl shadow-black/50' : 'bg-transparent'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <img
               src={LOGO_SRC}
               alt="ProPilot Decks"
-              className="h-10 w-auto object-contain group-hover:opacity-90 transition-opacity"
+              className="h-16 w-auto object-contain group-hover:opacity-90 transition-opacity drop-shadow-lg"
             />
           </Link>
 
@@ -105,7 +105,7 @@ export default function Nav({ animationsEnabled, setAnimationsEnabled }) {
             className="fixed inset-0 z-40 lg:hidden"
           >
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-            <div className="relative w-72 h-full bg-[#0a0e1a] border-r border-white/10 flex flex-col p-6 pt-20">
+            <div className="relative w-72 h-full bg-[#0a0e1a] border-r border-white/10 flex flex-col p-6 pt-24">
               <div className="flex flex-col gap-1">
                 {links.map(link => (
                   <Link
