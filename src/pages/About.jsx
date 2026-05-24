@@ -16,7 +16,7 @@ export default function About() {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl sm:text-5xl font-display font-bold text-white mb-4"
           >
-            About <span className="gradient-text">ProPilot Decks</span>
+            About <span className="gradient-text">Lotus Pro Decks</span>
           </motion.h1>
         </div>
       </div>
@@ -25,11 +25,11 @@ export default function About() {
         {[
           {
             title: 'Why We Started',
-            body: "We love Commander. But we also remember what it was like to sit down at a table for the first time with a deck we barely understood, and lose badly, feeling confused the whole time. We built ProPilot Decks because that experience shouldn't be the norm. Every new player deserves a deck that actually works, with a guide that actually explains it.",
+            body: "We love Commander. But we also remember what it was like to sit down at a table for the first time with a deck we barely understood, and lose badly, feeling confused the whole time. We built Lotus Pro Decks because that experience shouldn't be the norm. Every new player deserves a deck that actually works, with a guide that actually explains it.",
           },
           {
             title: 'Who Builds the Decks',
-            body: "Every ProPilot deck is designed by players with years of competitive and casual Commander experience. We don't just throw cards together — every card is chosen because it works with your commander, your strategy, and your budget. Then we play-test. Then we write the guide. Then we ship.",
+            body: "Every Lotus Pro deck is designed by players with years of competitive and casual Commander experience. We don't just throw cards together — every card is chosen because it works with your commander, your strategy, and your budget. Then we play-test. Then we write the guide. Then we ship.",
           },
           {
             title: 'Our Philosophy',
@@ -71,7 +71,7 @@ export default function About() {
 
       <footer className="bg-[#020817] border-t border-white/5 py-8">
         <div className="max-w-7xl mx-auto px-4 text-center text-xs text-gray-700">
-          ProPilot Decks — Expert-Built. Beginner-Ready. Not affiliated with Wizards of the Coast.
+          Lotus Pro Decks — Expert-Built. Beginner-Ready. Not affiliated with Wizards of the Coast.
         </div>
       </footer>
     </div>

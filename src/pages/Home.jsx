@@ -135,7 +135,7 @@ export default function Home({ animationsEnabled }) {
       {/* Footer */}
       <footer className="bg-[#020817] border-t border-white/5 py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center text-sm text-gray-600">
-          <div className="font-display font-bold text-white text-lg mb-2">ProPilot Decks</div>
+          <div className="font-display font-bold text-white text-lg mb-2">Lotus Pro Decks</div>
           <div className="mb-4">Expert-Built. Beginner-Ready.</div>
           <div className="flex flex-wrap justify-center gap-6 text-xs text-gray-500 mb-4">
             {['Home', 'Shop Decks', 'How It Works', 'Brackets', 'About', 'Contact'].map(l => (
@@ -143,7 +143,7 @@ export default function Home({ animationsEnabled }) {
             ))}
           </div>
           <div className="text-xs text-gray-700">
-            ProPilot Decks is not affiliated with Wizards of the Coast or Hasbro.
+            Lotus Pro Decks is not affiliated with Wizards of the Coast or Hasbro.
             All original card names are property of their respective owners.
           </div>
         </div>

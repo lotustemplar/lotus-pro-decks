@@ -80,7 +80,7 @@ export default function SurpriseBanner({ variant = 'section' }) {
           className="text-gray-400 max-w-md mx-auto text-base leading-relaxed"
         >
           We hide something extra in every single package. We're not telling you what it is —
-          that's the point. Consider it our thank-you for joining the ProPilot community.
+          that's the point. Consider it our thank-you for joining the Lotus Pro community.
         </motion.p>
 
         {/* Decorative dots row */}

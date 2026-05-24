@@ -41,7 +41,7 @@ const MTG_COLORS = [
 ];
 // Difficulty is now a 0–10 numeric scale (step 0.5)
 const REPO_OWNER = 'lotustemplar';
-const REPO_NAME  = 'propilot-decks';
+const REPO_NAME  = 'lotus-pro-decks';
 
 function colorKey(c) { return [...c].sort().join(','); }
 function deriveColorMeta(colors) {
@@ -284,7 +284,7 @@ function LoginGate({ onAuth }) {
         <p className="text-gray-500 text-sm text-center mb-8">
           {mode === 'setup'
             ? 'First time setup — choose a password for this admin panel.'
-            : 'ProPilot Decks admin panel'}
+            : 'Lotus Pro Decks admin panel'}
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="relative">
@@ -355,7 +355,7 @@ function GitHubSettings({ token, onSave, onClose }) {
           Create a fine-grained token at{' '}
           <a href="https://github.com/settings/tokens?type=fine-grained" target="_blank" rel="noreferrer"
             className="text-blue-400 underline">github.com/settings/tokens</a>.
-          Set <strong className="text-gray-300">Repository access → Only select → propilot-decks</strong>,
+          Set <strong className="text-gray-300">Repository access → Only select → lotus-pro-decks</strong>,
           then <strong className="text-gray-300">Permissions → Contents → Read and write</strong>.
         </p>
         <div className="relative mb-2">

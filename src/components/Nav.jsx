@@ -42,7 +42,7 @@ export default function Nav({ animationsEnabled, setAnimationsEnabled }) {
           <Link to="/" className="flex items-center gap-2 group">
             <img
               src={LOGO_SRC}
-              alt="ProPilot Decks"
+              alt="Lotus Pro Decks"
               className="h-16 w-auto object-contain group-hover:opacity-90 transition-opacity drop-shadow-lg"
             />
           </Link>

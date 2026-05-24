@@ -348,7 +348,7 @@ export default function DeckDetail({ animationsEnabled }) {
       {/* Footer */}
       <footer className="bg-[#020817] border-t border-white/5 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center text-xs text-gray-700">
-          ProPilot Decks — Expert-Built. Beginner-Ready. Not affiliated with Wizards of the Coast.
+          Lotus Pro Decks — Expert-Built. Beginner-Ready. Not affiliated with Wizards of the Coast.
         </div>
       </footer>
     </div>

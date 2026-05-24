@@ -63,7 +63,7 @@ export default function HowItWorks() {
             transition={{ delay: 0.2 }}
             className="text-gray-400 text-lg max-w-xl mx-auto"
           >
-            From discovery to your first win — here's the ProPilot Decks experience.
+            From discovery to your first win — here's the Lotus Pro Decks experience.
           </motion.p>
         </div>
       </div>
@@ -128,7 +128,7 @@ export default function HowItWorks() {
 
       <footer className="bg-[#020817] border-t border-white/5 py-8">
         <div className="max-w-7xl mx-auto px-4 text-center text-xs text-gray-700">
-          ProPilot Decks — Expert-Built. Beginner-Ready. Not affiliated with Wizards of the Coast.
+          Lotus Pro Decks — Expert-Built. Beginner-Ready. Not affiliated with Wizards of the Coast.
         </div>
       </footer>
     </div>

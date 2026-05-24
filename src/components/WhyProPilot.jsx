@@ -103,7 +103,7 @@ export default function WhyProPilot() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-3xl sm:text-4xl font-display font-bold text-white mb-4"
           >
-            Why <span className="gradient-text">ProPilot Decks?</span>
+            Why <span className="gradient-text">Lotus Pro Decks?</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}

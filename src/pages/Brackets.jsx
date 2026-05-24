@@ -53,7 +53,7 @@ export default function Brackets() {
 
       <footer className="bg-[#020817] border-t border-white/5 py-8">
         <div className="max-w-7xl mx-auto px-4 text-center text-xs text-gray-700">
-          ProPilot Decks — Expert-Built. Beginner-Ready.
+          Lotus Pro Decks — Expert-Built. Beginner-Ready.
         </div>
       </footer>
     </div>
