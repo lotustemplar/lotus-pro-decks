@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ShoppingCart, ChevronDown, ChevronUp, Star } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, ChevronDown, ChevronUp, Star, Loader2 } from 'lucide-react';
 import { decks, colorMeta } from '../data/decks';
 import ElementalOverlay from '../components/ElementalOverlay';
 import DifficultyMeter from '../components/DifficultyMeter';
@@ -75,13 +75,35 @@ export default function DeckDetail({ animationsEnabled }) {
   const { id } = useParams();
   const deck = decks.find(d => d.id === Number(id));
   const [activeTab, setActiveTab] = useState('Strategy');
-  const [addedToCart, setAddedToCart] = useState(false);
+  const [buying, setBuying] = useState(false);
+  const [buyError, setBuyError] = useState(null);
 
   if (!deck) return <Navigate to="/shop" replace />;
 
-  const handleAddToCart = () => {
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 2000);
+  const handleBuyNow = async () => {
+    if (!deck.stripePrice || deck.stripePrice.startsWith('price_MEREN') ||
+        deck.stripePrice.startsWith('price_ELSHA') || deck.stripePrice.startsWith('price_KRENKO') ||
+        deck.stripePrice.startsWith('price_RHYS') || deck.stripePrice.startsWith('price_ATRAXA') ||
+        deck.stripePrice.startsWith('price_LIESA') || deck.stripePrice.startsWith('price_TEYSA') ||
+        deck.stripePrice.startsWith('price_ULALEK')) {
+      setBuyError('Checkout not yet configured. Please contact us to order.');
+      return;
+    }
+    setBuying(true);
+    setBuyError(null);
+    try {
+      const res = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId: deck.stripePrice, deckName: deck.name }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Checkout failed');
+      window.location.href = data.url;
+    } catch (err) {
+      setBuyError(err.message);
+      setBuying(false);
+    }
   };
 
   return (
@@ -300,22 +322,27 @@ export default function DeckDetail({ animationsEnabled }) {
 
               {/* CTA */}
               <button
-                onClick={handleAddToCart}
+                onClick={handleBuyNow}
+                disabled={buying}
                 className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-base
-                  text-white transition-all duration-200 mb-3"
+                  text-white transition-all duration-200 mb-3 disabled:opacity-70 disabled:cursor-not-allowed"
                 style={{
-                  background: addedToCart
-                    ? 'linear-gradient(135deg, #22c55e, #16a34a)'
-                    : `linear-gradient(135deg, ${deck.accentColor}, ${deck.accentColor}99)`,
+                  background: `linear-gradient(135deg, ${deck.accentColor}, ${deck.accentColor}99)`,
                   boxShadow: `0 8px 24px ${deck.accentColor}33`,
                 }}
               >
-                <ShoppingCart size={18} />
-                {addedToCart ? 'Added to Cart!' : 'Add to Cart'}
+                {buying
+                  ? <><Loader2 size={18} className="animate-spin" /> Redirecting to checkout…</>
+                  : <><ShoppingCart size={18} /> Buy Now — ${deck.price}</>
+                }
               </button>
 
+              {buyError && (
+                <p className="text-xs text-center text-red-400 mb-3">{buyError}</p>
+              )}
+
               <p className="text-xs text-center text-gray-600 mb-5">
-                Checkout coming soon — contact us to order
+                Secure checkout powered by Stripe
               </p>
 
               {/* Deck snapshot */}

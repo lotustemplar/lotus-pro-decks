@@ -9,6 +9,7 @@ import Brackets from './pages/Brackets';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
+import Success from './pages/Success';
 
 export default function App() {
   const [animationsEnabled, setAnimationsEnabled] = useState(true);
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/success" element={<Success />} />
         </Routes>
       </div>
     </HashRouter>
