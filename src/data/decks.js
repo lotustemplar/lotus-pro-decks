@@ -3,7 +3,7 @@ export const decks = [
     id: 1,
     name: "Meren Graveyard Engine",
     commander: "Meren of Clan Nel Toth",
-    price: 69,
+    price: 78,
     bracket: 2,
     colors: ["black","green"],
     colorLabel: "Black / Green",
@@ -35,9 +35,10 @@ export const decks = [
       { section: "Lands (36)", cards: ["Command Tower","Golgari Rot Farm","Temple of Malady","Jungle Hollow","Woodland Cemetery","Tainted Wood","Llanowar Wastes","Bojuka Bog","Myriad Landscape","Evolving Wilds","Terramorphic Expanse","Path of Ancestry","Golgari Guildgate","Temple of the False God","Drownyard Temple","Thriving Grove","Thriving Moor","Swamp x10","Forest x9"] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Strategy card", "Synergy cheat sheet", "Upgrade path guide", "Storage sleeve set"],
-    stripePrice: 'price_MEREN',   // ← replace with real Stripe Price ID
     featured: true,
     quantity: 1,
+    stripePrice: "price_1TalvP2iRe5T5JCTmMa0tJxE",
+    ourCost: 47,
   },
   {
     id: 2,
@@ -69,9 +70,10 @@ export const decks = [
       { section: "Lands (36)", cards: ["Command Tower","Cascade Bluffs","Mystic Monastery","Shivan Reef","Steam Vents","Sacred Foundry","Hallowed Fountain","Flooded Strand","Scalding Tarn","Arid Mesa","Sulfur Falls","Clifftop Retreat","Glacial Fortress","Island x10","Mountain x5","Plains x3"] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Storm combo reference card", "Synergy cheat sheet", "Upgrade path guide", "Storage sleeve set"],
-    stripePrice: 'price_ELSHA',   // ← replace with real Stripe Price ID
     featured: false,
     quantity: 10,
+    stripePrice: "price_ELSHA",
+    ourCost: 0,
   },
   {
     id: 4,
@@ -106,9 +108,10 @@ export const decks = [
       { section: "Lands (36)", cards: ["Path of Ancestry","Unclaimed Territory","Secluded Courtyard","Temple of the False God","Myriad Landscape","Forgotten Cave","Evolving Wilds","Terramorphic Expanse","Thriving Bluff","Mountain x27"] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Goblin reference card", "Synergy cheat sheet", "Upgrade path guide", "Storage sleeve set"],
-    stripePrice: 'price_KRENKO',  // ← replace with real Stripe Price ID
     featured: true,
     quantity: 1,
+    stripePrice: "price_KRENKO",
+    ourCost: 0,
   },
   {
     id: 3,
@@ -141,9 +144,10 @@ export const decks = [
       { section: "Lands (36)", cards: ["Command Tower","Temple Garden","Sunpetal Grove","Canopy Vista","Scattered Groves","Fortified Village","Selesnya Guildgate","Gavony Township","Oran-Rief, the Vastwood","Plains x13","Forest x13"] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Token reference sheet", "Synergy cheat sheet", "Upgrade path guide", "Storage sleeve set"],
-    stripePrice: 'price_RHYS',    // ← replace with real Stripe Price ID
     featured: false,
     quantity: 10,
+    stripePrice: "price_RHYS",
+    ourCost: 0,
   },
   {
     id: 5,
@@ -176,9 +180,10 @@ export const decks = [
       { section: "Lands (36)", cards: ["Command Tower","Breeding Pool","Overgrown Tomb","Watery Grave","Godless Shrine","Temple Garden","Hallowed Fountain","Volrath's Stronghold","Reflecting Pool","City of Brass","Mana Confluence","Exotic Orchard","Swamp x4","Forest x4","Island x4","Plains x4"] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Planeswalker reference card", "Proliferate trigger guide", "Upgrade path guide", "Storage sleeve set"],
-    stripePrice: 'price_ATRAXA',  // ← replace with real Stripe Price ID
     featured: false,
     quantity: 10,
+    stripePrice: "price_ATRAXA",
+    ourCost: 0,
   },
   {
     id: 6,
@@ -211,9 +216,10 @@ export const decks = [
       { section: "Lands (36)", cards: ["Command Tower","Godless Shrine","Isolated Chapel","Shambling Vent","Vault of the Archangel","Concealed Courtyard","Fetid Heath","Scrubland","Plains x12","Swamp x12"] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Lifegain trigger reference", "Synergy cheat sheet", "Upgrade path guide", "Storage sleeve set"],
-    stripePrice: 'price_LIESA',   // ← replace with real Stripe Price ID
     featured: false,
     quantity: 10,
+    stripePrice: "price_LIESA",
+    ourCost: 0,
   },
   {
     id: 7,
@@ -249,9 +255,10 @@ export const decks = [
       { section: "Lands (36)", cards: ["Command Tower","Orzhov Basilica","Temple of Silence","Scoured Barrens","Isolated Chapel","Caves of Koilos","Tainted Field","Orzhov Guildgate","Bojuka Bog","Myriad Landscape","Evolving Wilds","Terramorphic Expanse","Path of Ancestry","Temple of the False God","Thriving Heath","Thriving Moor","Plains x10","Swamp x10"] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Clue token pack", "Aristocrat trigger reference", "Upgrade path guide", "Storage sleeve set"],
-    stripePrice: 'price_TEYSA',   // ← replace with real Stripe Price ID
     featured: true,
     quantity: 10,
+    stripePrice: "price_TEYSA",
+    ourCost: 0,
   },
   {
     id: 8,
@@ -282,9 +289,10 @@ export const decks = [
       { section: "Lands (37)", cards: ["Command Tower","Path of Ancestry","Exotic Orchard","Unclaimed Territory","Secluded Courtyard","Corrupted Crossroads","Eldrazi Temple","Shrine of the Forsaken Gods","Ugin's Labyrinth","Urza's Cave","Spawning Bed","Battlefield Forge","Llanowar Wastes","Brushland","Underground River","Adarkar Wastes","Karplusan Forest","Yavimaya Coast","Sulfurous Springs","Caves of Koilos","Shivan Reef","Bonders' Enclave","Reliquary Tower","Tomb of the Spirit Dragon","Ruins of Oran-Rief","Cascading Cataracts","Tendo Ice Bridge","Opal Palace","Ash Barrens","Twisted Landscape","Tranquil Landscape","Wastes","Plains","Island","Swamp","Mountain","Forest"] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Eldrazi token pack", "Counter tracker set", "Upgrade path guide", "Storage sleeve set"],
-    stripePrice: 'price_ULALEK',  // ← replace with real Stripe Price ID
     featured: true,
     quantity: 1,
+    stripePrice: "price_ULALEK",
+    ourCost: 0,
   }
 ];
 
