@@ -4,6 +4,7 @@ import { ArrowRight, ChevronDown } from 'lucide-react';
 import ParticleBackground from './ParticleBackground';
 import { decks, colorMeta } from '../data/decks';
 
+const LOGO_SRC = `${import.meta.env.BASE_URL}images/logo.png`;
 const featuredDecks = decks.filter(d => d.featured).slice(0, 3);
 
 const floatVariants = [
@@ -15,6 +16,21 @@ const floatVariants = [
 export default function Hero({ animationsEnabled }) {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-[#020817]">
+
+      {/* Brand watermark — screen blend makes the white bg vanish on dark */}
+      <div
+        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        style={{ zIndex: 0 }}
+      >
+        <img
+          src={LOGO_SRC}
+          alt=""
+          aria-hidden="true"
+          className="w-[680px] max-w-[80vw] select-none"
+          style={{ opacity: 0.055, mixBlendMode: 'screen', filter: 'blur(1px)' }}
+        />
+      </div>
+
       <ParticleBackground count={50} enabled={animationsEnabled} />
 
       {/* Radial hero glow */}
