@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { decks as initialDecks, colorMeta, playstyleMeta } from '../data/decks';
 import {
   Plus, Trash2, Edit2, Download, X, Check,
@@ -577,12 +577,23 @@ export default function Admin() {
   const [savedFlash, setSaved]    = useState(false);
   const [exportFlash, setExport]  = useState(false);
   // push status: 'idle' | 'pushing' | 'done' | 'error'
-  const [pushStatus, setPushStatus] = useState('idle');
-  const [pushError,  setPushError]  = useState('');
-  const [marginPct,  setMarginPct]  = useState(40);
+  const [pushStatus,    setPushStatus]    = useState('idle');
+  const [pushError,     setPushError]     = useState('');
+  const [marginPct,     setMarginPct]     = useState(40);
+  const [waitlistCounts, setWaitlistCounts] = useState({}); // { [deckId]: number }
+  const [restockMsg,    setRestockMsg]    = useState('');   // shown after restock send
 
   useEffect(() => { localStorage.setItem('adminDecks', JSON.stringify(deckList)); }, [deckList]);
   useEffect(() => { localStorage.setItem('admin_gh_token', ghToken); }, [ghToken]);
+
+  // Fetch waitlist counts on mount (best-effort — fails silently if KV not set up)
+  const fetchWaitlistCounts = useCallback(async () => {
+    try {
+      const res = await fetch('/api/waitlist-counts');
+      if (res.ok) setWaitlistCounts(await res.json());
+    } catch {}
+  }, []);
+  useEffect(() => { fetchWaitlistCounts(); }, [fetchWaitlistCounts]);
 
   if (!authed) return <LoginGate onAuth={() => setAuthed(true)} />;
 
@@ -619,7 +630,13 @@ export default function Admin() {
     set('playstyles', editing.playstyles.includes(t) ? editing.playstyles.filter(x => x !== t) : [...editing.playstyles, t]);
   }
   async function saveDeck() {
-    setPushStatus('pushing'); setPushError('');
+    setPushStatus('pushing'); setPushError(''); setRestockMsg('');
+
+    // ── 0. Detect restock BEFORE mutating state ───────────────────────────────
+    const prevDeck   = deckList.find(d => d.id === editing.id);
+    const wasOOS     = prevDeck ? (prevDeck.quantity === 0 || prevDeck.inStock === false) : false;
+    const nowInStock = editing.quantity > 0 && editing.inStock !== false;
+    const isRestock  = wasOOS && nowInStock;
 
     // ── 1. Sync with Stripe (non-fatal if it fails) ──────────────────────────
     let finalDeck = { ...editing };
@@ -664,6 +681,30 @@ export default function Admin() {
       try {
         await pushDecksJs(next, ghToken);
         setPushStatus('done'); setTimeout(() => setPushStatus('idle'), 5000);
+
+        // ── 4. Send restock emails if applicable ──────────────────────────────
+        if (isRestock) {
+          try {
+            const r = await fetch('/api/send-restock-emails', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                deckId:    String(finalDeck.id),
+                deckName:  finalDeck.name,
+                deckPrice: finalDeck.price,
+              }),
+            });
+            const data = await r.json();
+            if (data.sent > 0) {
+              setRestockMsg(`📧 Restock emails sent to ${data.sent} subscriber${data.sent !== 1 ? 's' : ''}.`);
+              fetchWaitlistCounts(); // refresh counts
+            } else {
+              setRestockMsg('✓ Restocked — no waitlist subscribers to notify.');
+            }
+          } catch (err) {
+            console.warn('[Admin] restock email error (non-fatal):', err.message);
+          }
+        }
       } catch (err) {
         console.error('[Admin] push failed:', err);
         setPushStatus('error'); setPushError(err.message);
@@ -772,7 +813,12 @@ export default function Admin() {
                 {deck.image && <img src={deck.image} alt="" className="w-full h-full object-contain" />}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-white truncate">{deck.name || 'Untitled'}</div>
+                <div className="font-semibold text-white truncate flex items-center gap-2">
+                  {deck.name || 'Untitled'}
+                  {(deck.quantity === 0 || deck.inStock === false) && (
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-500/15 text-red-400 border border-red-500/20 shrink-0">SOLD OUT</span>
+                  )}
+                </div>
                 <div className="text-xs text-gray-500 mt-0.5 flex flex-wrap gap-2">
                   <span>{deck.commander || '—'}</span>
                   <span className="text-gray-700">·</span>
@@ -781,6 +827,12 @@ export default function Admin() {
                   <span>${deck.price}</span>
                   <span className="text-gray-700">·</span>
                   <span>Qty: {deck.quantity ?? '—'}</span>
+                  {waitlistCounts[String(deck.id)] > 0 && (
+                    <>
+                      <span className="text-gray-700">·</span>
+                      <span className="text-purple-400 font-medium">🔔 {waitlistCounts[String(deck.id)]} waiting</span>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="hidden sm:flex gap-1">
@@ -832,9 +884,14 @@ export default function Admin() {
             </div>
           )}
           {pushStatus === 'done' && (
-            <div className="flex items-center gap-3 p-4 rounded-2xl bg-[#0f1629] border border-green-500/30 text-green-400 text-sm">
-              <Check size={16} className="shrink-0" />
-              Live! Site is rebuilding now.
+            <div className="flex flex-col gap-1.5 p-4 rounded-2xl bg-[#0f1629] border border-green-500/30 text-sm">
+              <div className="flex items-center gap-3 text-green-400">
+                <Check size={16} className="shrink-0" />
+                Live! Site is rebuilding now.
+              </div>
+              {restockMsg && (
+                <div className="text-blue-300 text-xs pl-7">{restockMsg}</div>
+              )}
             </div>
           )}
           {pushStatus === 'error' && (

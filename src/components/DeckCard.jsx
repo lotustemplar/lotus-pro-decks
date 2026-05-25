@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Star, Zap, ChevronRight } from 'lucide-react';
+import { Star, Zap, ChevronRight, Bell } from 'lucide-react';
 import ElementalOverlay from './ElementalOverlay';
 import DifficultyMeter from './DifficultyMeter';
 import { colorMeta } from '../data/decks';
@@ -44,6 +44,9 @@ const QUICK_STRATEGY_TIPS = {
 export default function DeckCard({ deck, animationsEnabled }) {
   const [hovered, setHovered] = useState(false);
   const [showQuick, setShowQuick] = useState(false);
+
+  const soldOut  = deck.quantity === 0 || deck.inStock === false;
+  const lowStock = !soldOut && deck.quantity > 0 && deck.quantity <= 3;
 
   const primaryTag = deck.playstyles[0];
   const strategyTip = QUICK_STRATEGY_TIPS[primaryTag] || deck.description;
@@ -103,8 +106,27 @@ export default function DeckCard({ deck, animationsEnabled }) {
             <ElementalOverlay colors={deck.colors} enabled={true} />
           )}
 
+          {/* Sold-out overlay */}
+          {soldOut && (
+            <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-10">
+              <div className="text-white font-black text-2xl tracking-widest uppercase mb-1" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+                Sold Out
+              </div>
+              <div className="text-gray-400 text-xs">Join the waitlist →</div>
+            </div>
+          )}
+
+          {/* Low-stock ribbon */}
+          {lowStock && (
+            <div className="absolute bottom-12 left-0 right-0 flex justify-center z-10">
+              <div className="px-3 py-1 rounded-full bg-orange-500/90 text-white text-xs font-bold shadow-lg">
+                ⚡ Only {deck.quantity} left
+              </div>
+            </div>
+          )}
+
           {/* Top badges */}
-          <div className="absolute top-3 left-3 flex items-center gap-2">
+          <div className="absolute top-3 left-3 flex items-center gap-2 z-10">
             <span className={`text-xs font-bold px-2 py-0.5 rounded-full bg-black/60 border border-white/10 ${BRACKET_COLOR[deck.bracket]}`}>
               Bracket {deck.bracket}
             </span>
@@ -116,7 +138,7 @@ export default function DeckCard({ deck, animationsEnabled }) {
           </div>
 
           {/* Price badge */}
-          <div className="absolute top-3 right-3 px-2.5 py-0.5 rounded-full bg-black/70 border border-white/15 text-white font-bold text-sm">
+          <div className="absolute top-3 right-3 px-2.5 py-0.5 rounded-full bg-black/70 border border-white/15 text-white font-bold text-sm z-10">
             ${deck.price}
           </div>
 
@@ -159,17 +181,27 @@ export default function DeckCard({ deck, animationsEnabled }) {
 
           {/* Action buttons */}
           <div className="flex gap-2">
-            <Link
-              to={`/deck/${deck.id}`}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-semibold
-                text-white transition-all duration-200"
-              style={{
-                background: `linear-gradient(135deg, ${deck.accentColor}cc, ${deck.accentColor}88)`,
-                boxShadow: hovered ? `0 4px 20px ${deck.accentColor}44` : 'none',
-              }}
-            >
-              View Deck <ChevronRight size={14} />
-            </Link>
+            {soldOut ? (
+              <Link
+                to={`/deck/${deck.id}`}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-semibold
+                  text-white transition-all duration-200 bg-white/8 border border-white/15 hover:bg-white/12"
+              >
+                <Bell size={14} /> Notify Me
+              </Link>
+            ) : (
+              <Link
+                to={`/deck/${deck.id}`}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-semibold
+                  text-white transition-all duration-200"
+                style={{
+                  background: `linear-gradient(135deg, ${deck.accentColor}cc, ${deck.accentColor}88)`,
+                  boxShadow: hovered ? `0 4px 20px ${deck.accentColor}44` : 'none',
+                }}
+              >
+                View Deck <ChevronRight size={14} />
+              </Link>
+            )}
             <button
               onClick={(e) => { e.preventDefault(); setShowQuick(true); }}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium

@@ -36,7 +36,7 @@ export default function Hero({ animationsEnabled }) {
               bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm font-medium"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-            Expert-Built. Beginner-Ready.
+            Expert-Built · Limited Runs · Never Mass-Produced
           </motion.div>
 
           <motion.h1
@@ -58,8 +58,8 @@ export default function Hero({ animationsEnabled }) {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg text-gray-400 leading-relaxed mb-8 max-w-xl"
           >
-            Beginner-friendly, professionally built decks with clear strategies, upgrade paths,
-            and everything you need to sit down and play — tonight.
+            Professionally built Commander decks with clear strategies, upgrade paths, and everything
+            you need to play tonight. <span className="text-white font-medium">Exclusive, handcrafted builds</span> — not a warehouse product. Each run is limited and sells out fast.
           </motion.p>
 
           <motion.div

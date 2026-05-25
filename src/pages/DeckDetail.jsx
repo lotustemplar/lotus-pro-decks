@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ShoppingCart, ChevronDown, ChevronUp, Star, Loader2 } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, ChevronDown, ChevronUp, Star, Loader2, Bell, Check, Lock } from 'lucide-react';
 import { decks, colorMeta } from '../data/decks';
 import ElementalOverlay from '../components/ElementalOverlay';
 import DifficultyMeter from '../components/DifficultyMeter';
@@ -78,6 +78,14 @@ export default function DeckDetail({ animationsEnabled }) {
   const [buying, setBuying] = useState(false);
   const [buyError, setBuyError] = useState(null);
 
+  // Notify Me state
+  const [notifyEmail, setNotifyEmail]   = useState('');
+  const [notifyState, setNotifyState]   = useState('idle'); // idle | loading | done | error
+  const [notifyError, setNotifyError]   = useState('');
+
+  const soldOut  = deck?.quantity === 0 || deck?.inStock === false;
+  const lowStock = !soldOut && deck?.quantity > 0 && deck?.quantity <= 5;
+
   if (!deck) return <Navigate to="/shop" replace />;
 
   const handleBuyNow = async () => {
@@ -103,6 +111,25 @@ export default function DeckDetail({ animationsEnabled }) {
     } catch (err) {
       setBuyError(err.message);
       setBuying(false);
+    }
+  };
+
+  const handleNotifyMe = async (e) => {
+    e.preventDefault();
+    if (!notifyEmail) return;
+    setNotifyState('loading'); setNotifyError('');
+    try {
+      const res = await fetch('/api/notify-me', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: notifyEmail, deckId: String(deck.id), deckName: deck.name }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+      setNotifyState('done');
+    } catch (err) {
+      setNotifyError(err.message);
+      setNotifyState('error');
     }
   };
 
@@ -303,12 +330,19 @@ export default function DeckDetail({ animationsEnabled }) {
           <div className="lg:col-span-1">
             <div
               className="sticky top-24 glass rounded-2xl border p-5"
-              style={{ borderColor: `${deck.accentColor}33` }}
+              style={{ borderColor: soldOut ? 'rgba(255,255,255,0.1)' : `${deck.accentColor}33` }}
             >
+              {/* Exclusivity badge */}
+              <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-purple-500/8 border border-purple-500/20">
+                <Lock size={11} className="text-purple-400 shrink-0" />
+                <span className="text-xs text-purple-300 font-medium">Handcrafted · Never mass-produced · Limited runs</span>
+              </div>
+
               {/* Price */}
               <div className="flex items-baseline gap-2 mb-4">
-                <span className="text-4xl font-display font-bold text-white">${deck.price}</span>
+                <span className={`text-4xl font-display font-bold ${soldOut ? 'text-gray-500' : 'text-white'}`}>${deck.price}</span>
                 <span className="text-sm text-gray-500">USD</span>
+                {soldOut && <span className="ml-1 text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-full">SOLD OUT</span>}
               </div>
 
               {/* Badges */}
@@ -320,30 +354,74 @@ export default function DeckDetail({ animationsEnabled }) {
                 ))}
               </div>
 
-              {/* CTA */}
-              <button
-                onClick={handleBuyNow}
-                disabled={buying}
-                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-base
-                  text-white transition-all duration-200 mb-3 disabled:opacity-70 disabled:cursor-not-allowed"
-                style={{
-                  background: `linear-gradient(135deg, ${deck.accentColor}, ${deck.accentColor}99)`,
-                  boxShadow: `0 8px 24px ${deck.accentColor}33`,
-                }}
-              >
-                {buying
-                  ? <><Loader2 size={18} className="animate-spin" /> Redirecting to checkout…</>
-                  : <><ShoppingCart size={18} /> Buy Now — ${deck.price}</>
-                }
-              </button>
-
-              {buyError && (
-                <p className="text-xs text-center text-red-400 mb-3">{buyError}</p>
+              {/* Scarcity warning */}
+              {lowStock && (
+                <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-orange-500/10 border border-orange-500/25">
+                  <span className="text-orange-400 text-sm">⚡</span>
+                  <span className="text-xs text-orange-300 font-semibold">Only {deck.quantity} left in stock — order soon</span>
+                </div>
               )}
 
-              <p className="text-xs text-center text-gray-600 mb-5">
-                Secure checkout powered by Stripe
-              </p>
+              {/* ── CTA: Buy Now OR Notify Me ── */}
+              {soldOut ? (
+                <div className="mb-5">
+                  {notifyState === 'done' ? (
+                    <div className="flex flex-col items-center gap-2 py-4 rounded-xl bg-green-500/8 border border-green-500/20 text-center">
+                      <Check size={20} className="text-green-400" />
+                      <p className="text-green-400 font-semibold text-sm">You're on the list!</p>
+                      <p className="text-gray-500 text-xs">We'll email you the moment it restocks.</p>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleNotifyMe} className="space-y-3">
+                      <p className="text-sm text-gray-400 leading-relaxed">
+                        This deck is currently sold out. Enter your email and we'll notify you the moment it's back — waitlist subscribers get first access.
+                      </p>
+                      <input
+                        type="email"
+                        value={notifyEmail}
+                        onChange={e => { setNotifyEmail(e.target.value); setNotifyState('idle'); }}
+                        placeholder="your@email.com"
+                        required
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm
+                          placeholder-gray-600 focus:outline-none focus:border-purple-500 transition-colors"
+                      />
+                      {notifyError && <p className="text-xs text-red-400">{notifyError}</p>}
+                      <button
+                        type="submit"
+                        disabled={notifyState === 'loading' || !notifyEmail}
+                        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-base
+                          text-white bg-purple-600 hover:bg-purple-500 transition-all duration-200
+                          disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {notifyState === 'loading'
+                          ? <><Loader2 size={18} className="animate-spin" /> Adding you to waitlist…</>
+                          : <><Bell size={18} /> Notify Me When Restocked</>
+                        }
+                      </button>
+                    </form>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <button
+                    onClick={handleBuyNow}
+                    disabled={buying}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-base
+                      text-white transition-all duration-200 mb-3 disabled:opacity-70 disabled:cursor-not-allowed"
+                    style={{
+                      background: `linear-gradient(135deg, ${deck.accentColor}, ${deck.accentColor}99)`,
+                      boxShadow: `0 8px 24px ${deck.accentColor}33`,
+                    }}
+                  >
+                    {buying
+                      ? <><Loader2 size={18} className="animate-spin" /> Redirecting to checkout…</>
+                      : <><ShoppingCart size={18} /> Buy Now — ${deck.price}</>
+                    }
+                  </button>
+                  {buyError && <p className="text-xs text-center text-red-400 mb-3">{buyError}</p>}
+                  <p className="text-xs text-center text-gray-600 mb-5">Secure checkout powered by Stripe</p>
+                </>
+              )}
 
               {/* Deck snapshot */}
               <div className="border-t border-white/8 pt-4 space-y-2.5">

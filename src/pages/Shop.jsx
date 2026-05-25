@@ -96,10 +96,32 @@ export default function Shop({ animationsEnabled }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-gray-400 max-w-lg mx-auto"
+            className="text-gray-400 max-w-lg mx-auto mb-5"
           >
-            Every deck is professionally built, synergy-checked, and includes a complete pilot guide so you can start playing immediately.
+            Every deck is professionally built, synergy-checked, and ready to play tonight.
+            These are <span className="text-white font-medium">exclusive, handcrafted builds</span> — never mass-produced and strictly limited.
           </motion.p>
+
+          {/* Exclusivity badges */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-wrap justify-center gap-3 mb-5"
+          >
+            {[
+              { icon: '🔒', text: 'Never Mass-Produced' },
+              { icon: '⚡', text: 'Limited Runs Only' },
+              { icon: '🃏', text: 'Handcrafted Builds' },
+              { icon: '🥇', text: 'First Come, First Served' },
+            ].map(b => (
+              <div key={b.text} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
+                bg-white/5 border border-white/10 text-gray-400 text-xs font-medium">
+                <span>{b.icon}</span> {b.text}
+              </div>
+            ))}
+          </motion.div>
+
           <div className="flex justify-center">
             <SurpriseBanner variant="header" />
           </div>
