@@ -3,7 +3,7 @@ import { decks as initialDecks, colorMeta, playstyleMeta } from '../data/decks';
 import {
   Plus, Trash2, Edit2, Download, X, Check,
   ChevronUp, ChevronDown, Upload, Settings, Lock, Eye, EyeOff, Github,
-  ImagePlus, Loader2, RefreshCw
+  ImagePlus, Loader2, RefreshCw, ArrowUpDown
 } from 'lucide-react';
 
 // ─── Color / gradient presets ─────────────────────────────────────────────────
@@ -583,6 +583,9 @@ export default function Admin() {
   const [pushStatus,    setPushStatus]    = useState('idle');
   const [pushError,     setPushError]     = useState('');
   const [marginPct,     setMarginPct]     = useState(40);
+  const [orderDirty,    setOrderDirty]    = useState(false);
+  const [orderPushing,  setOrderPushing]  = useState(false);
+  const [orderPushOk,   setOrderPushOk]   = useState(false);
   const [waitlistCounts, setWaitlistCounts] = useState({}); // { [deckId]: number }
   const [restockMsg,    setRestockMsg]    = useState('');   // shown after restock send
 
@@ -621,6 +624,26 @@ export default function Admin() {
       if (j < 0 || j >= p.length) return p;
       const a = [...p]; [a[i], a[j]] = [a[j], a[i]]; return a;
     });
+    setOrderDirty(true);
+    setOrderPushOk(false);
+  }
+
+  async function publishOrder() {
+    if (!ghToken) {
+      alert('Connect a GitHub token first (click the GitHub button in the top bar).');
+      return;
+    }
+    setOrderPushing(true);
+    try {
+      await pushDecksJs(deckList, ghToken);
+      setOrderDirty(false);
+      setOrderPushOk(true);
+      setTimeout(() => setOrderPushOk(false), 4000);
+    } catch (err) {
+      alert('Failed to publish order: ' + err.message);
+    } finally {
+      setOrderPushing(false);
+    }
   }
 
   // ── Edit helpers ─────────────────────────────────────────────────────────────
@@ -805,6 +828,35 @@ export default function Admin() {
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Site Settings</p>
           <LogoUploader token={ghToken} />
         </div>
+
+        {/* Order-changed banner */}
+        {(orderDirty || orderPushOk) && (
+          <div className={`mb-3 p-3 rounded-xl border text-sm flex items-center justify-between gap-3 transition-colors ${
+            orderPushOk
+              ? 'bg-green-500/8 border-green-500/20 text-green-400'
+              : 'bg-orange-500/10 border-orange-500/30 text-orange-300'
+          }`}>
+            <div className="flex items-center gap-2">
+              {orderPushOk
+                ? <><Check size={14} className="shrink-0" /> Order saved — live site updated.</>
+                : <><ArrowUpDown size={14} className="shrink-0" /> Deck order changed — not yet live.</>
+              }
+            </div>
+            {orderDirty && (
+              <button
+                onClick={publishOrder}
+                disabled={orderPushing}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-400
+                  text-white text-xs font-semibold transition-colors disabled:opacity-50 shrink-0"
+              >
+                {orderPushing
+                  ? <><Loader2 size={12} className="animate-spin" /> Publishing…</>
+                  : <><Upload size={12} /> Publish Order</>
+                }
+              </button>
+            )}
+          </div>
+        )}
 
         <div className="space-y-2">
           {deckList.map((deck, idx) => (
