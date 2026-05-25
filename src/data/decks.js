@@ -113,7 +113,7 @@ export const decks = [
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Clue token pack", "Aristocrat trigger reference", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
-    quantity: 10,
+    quantity: 1,
     stripePrice: "price_1TamAh2iRe5T5JCTEBim7YuM",
     ourCost: 73,
   },
