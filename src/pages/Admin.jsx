@@ -254,7 +254,7 @@ function LoginGate({ onAuth }) {
     if (mode === 'setup') {
       // First-run: save hash locally, log in
       localStorage.setItem(STORED_HASH_KEY, entered);
-      sessionStorage.setItem(SESSION_KEY, '1');
+      localStorage.setItem(SESSION_KEY, '1');
       onAuth();
       return;
     }
@@ -263,7 +263,7 @@ function LoginGate({ onAuth }) {
     const match = (CORRECT_HASH && entered === CORRECT_HASH)
       || (!CORRECT_HASH && localHash && entered === localHash);
     if (match) {
-      sessionStorage.setItem(SESSION_KEY, '1');
+      localStorage.setItem(SESSION_KEY, '1');
       onAuth();
     } else {
       setErr('Incorrect password.');
@@ -551,7 +551,7 @@ function ImageUploader({ token, currentImage, onUploaded }) {
 // ─── Main admin component ─────────────────────────────────────────────────────
 export default function Admin() {
   // Auth
-  const [authed, setAuthed] = useState(() => !!sessionStorage.getItem(SESSION_KEY));
+  const [authed, setAuthed] = useState(() => !!localStorage.getItem(SESSION_KEY));
 
   // GitHub token
   const [ghToken, setGhToken] = useState(() => localStorage.getItem('admin_gh_token') || '');
