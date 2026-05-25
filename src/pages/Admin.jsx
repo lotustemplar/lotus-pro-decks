@@ -148,6 +148,7 @@ function generateDecksJs(deckList) {
     fullDecklist: [\n${decklist}\n    ],
     included: [${included}],
     featured: ${!!deck.featured},
+    premium: ${!!deck.premium},
     quantity: ${deck.quantity ?? 10},
     stripePrice: ${JSON.stringify(deck.stripePrice || '')},
     ourCost: ${deck.ourCost ?? 0},
@@ -210,12 +211,14 @@ function TextArea({ label, value, onChange, rows = 3, placeholder }) {
     </div>
   );
 }
-function Toggle({ checked, onChange, label }) {
+const TOGGLE_COLORS = { blue: '#3b82f6', orange: '#f97316' };
+function Toggle({ checked, onChange, label, accent = 'blue' }) {
+  const activeColor = TOGGLE_COLORS[accent] ?? TOGGLE_COLORS.blue;
   return (
     <label className="flex items-center gap-3 cursor-pointer select-none">
       <div onClick={() => onChange(!checked)}
         className="w-10 h-6 rounded-full transition-colors relative shrink-0"
-        style={{ background: checked ? '#3b82f6' : '#374151' }}>
+        style={{ background: checked ? activeColor : '#374151' }}>
         <div className="absolute top-1 w-4 h-4 rounded-full bg-white transition-transform"
           style={{ transform: checked ? 'translateX(18px)' : 'translateX(2px)' }} />
       </div>
@@ -1011,6 +1014,7 @@ export default function Admin() {
               </div>
               <Toggle checked={editing.inStock !== false} onChange={v => set('inStock', v)} label="Show as In Stock" />
               <Toggle checked={!!editing.featured} onChange={v => set('featured', v)} label="Featured (hero & homepage)" />
+              <Toggle checked={!!editing.premium} onChange={v => set('premium', v)} label="Premium (fire border + Limited Edition badge)" accent="orange" />
             </div>
           </div>
 
