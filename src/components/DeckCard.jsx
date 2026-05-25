@@ -51,6 +51,8 @@ export default function DeckCard({ deck, animationsEnabled }) {
   const primaryTag = deck.playstyles[0];
   const strategyTip = QUICK_STRATEGY_TIPS[primaryTag] || deck.description;
 
+  const isPremium = !!deck.premium;
+
   return (
     <>
       <motion.div
@@ -59,14 +61,16 @@ export default function DeckCard({ deck, animationsEnabled }) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.3 }}
-        className="relative group rounded-2xl overflow-hidden border border-white/8 glass deck-card-hover"
+        className={`relative group rounded-2xl overflow-hidden glass deck-card-hover ${
+          isPremium ? 'fire-border' : 'border border-white/8'
+        }`}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        style={{
+        style={!isPremium ? {
           boxShadow: hovered
             ? `0 20px 60px ${deck.accentColor}33, 0 0 0 1px ${deck.accentColor}44`
             : '0 4px 24px rgba(0,0,0,0.4)',
-        }}
+        } : undefined}
       >
         {/* Art panel — 1:1 square */}
         <div
@@ -130,7 +134,19 @@ export default function DeckCard({ deck, animationsEnabled }) {
             <span className={`text-xs font-bold px-2 py-0.5 rounded-full bg-black/60 border border-white/10 ${BRACKET_COLOR[deck.bracket]}`}>
               Bracket {deck.bracket}
             </span>
-            {deck.featured && (
+            {isPremium ? (
+              <span
+                className="text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1 whitespace-nowrap"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(200,50,0,0.45), rgba(255,120,0,0.35))',
+                  border: '1px solid rgba(255,120,0,0.55)',
+                  color: '#ffb347',
+                  textShadow: '0 0 8px rgba(255,120,0,0.6)',
+                }}
+              >
+                🔥 LIMITED EDITION PREMIUM
+              </span>
+            ) : deck.featured && (
               <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-yellow-500/20 border border-yellow-500/40 text-yellow-400 flex items-center gap-1">
                 <Star size={9} fill="currentColor" /> Featured
               </span>
@@ -213,14 +229,16 @@ export default function DeckCard({ deck, animationsEnabled }) {
           </div>
         </div>
 
-        {/* Hover glow border */}
-        <div
-          className="absolute inset-0 rounded-2xl pointer-events-none transition-opacity duration-300"
-          style={{
-            opacity: hovered ? 1 : 0,
-            boxShadow: `inset 0 0 0 1px ${deck.accentColor}55`,
-          }}
-        />
+        {/* Hover glow border — only for non-premium (premium uses fire animation) */}
+        {!isPremium && (
+          <div
+            className="absolute inset-0 rounded-2xl pointer-events-none transition-opacity duration-300"
+            style={{
+              opacity: hovered ? 1 : 0,
+              boxShadow: `inset 0 0 0 1px ${deck.accentColor}55`,
+            }}
+          />
+        )}
       </motion.div>
 
       {/* Quick Strategy Modal */}

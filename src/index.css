@@ -237,6 +237,52 @@ input[type="range"]::-webkit-slider-thumb {
   transform: translateX(0);
 }
 
+/* ── Premium fire border ───────────────────────────────────────────────── */
+@keyframes fireBorderGlow {
+  0%   {
+    box-shadow: 0 0 6px 1px #c0392b, 0 0 16px 4px #e74c3c, 0 0 36px 8px rgba(231,76,60,0.28), 0 0 0 1.5px #e74c3c;
+    border-color: #e74c3c;
+  }
+  25%  {
+    box-shadow: 0 0 10px 2px #e67e22, 0 0 24px 6px #f39c12, 0 0 52px 12px rgba(243,156,18,0.28), 0 0 0 1.5px #f39c12;
+    border-color: #f39c12;
+  }
+  50%  {
+    box-shadow: 0 0 13px 3px #d35400, 0 0 30px 7px #e67e22, 0 0 62px 14px rgba(211,84,0,0.28), 0 0 0 1.5px #e67e22;
+    border-color: #e67e22;
+  }
+  75%  {
+    box-shadow: 0 0 8px 2px #e74c3c, 0 0 20px 5px #c0392b, 0 0 44px 10px rgba(192,57,43,0.28), 0 0 0 1.5px #c0392b;
+    border-color: #c0392b;
+  }
+  100% {
+    box-shadow: 0 0 6px 1px #c0392b, 0 0 16px 4px #e74c3c, 0 0 36px 8px rgba(231,76,60,0.28), 0 0 0 1.5px #e74c3c;
+    border-color: #e74c3c;
+  }
+}
+
+.fire-border {
+  border: 1.5px solid #e74c3c;
+  animation: fireBorderGlow 2.5s ease-in-out infinite;
+}
+
+/* ── Glowing gift emoji ────────────────────────────────────────────────── */
+@keyframes giftPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 3px rgba(255,200,0,0.5)) drop-shadow(0 0 7px rgba(255,140,0,0.3));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 7px rgba(255,215,0,0.9)) drop-shadow(0 0 16px rgba(255,140,0,0.5));
+    transform: scale(1.15);
+  }
+}
+
+.gift-glow {
+  display: inline-block;
+  animation: giftPulse 2s ease-in-out infinite;
+}
+
 /* Hide scrollbar but keep scrolling */
 .scrollbar-hide {
   -ms-overflow-style: none;
