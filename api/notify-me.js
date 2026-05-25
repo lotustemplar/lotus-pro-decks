@@ -2,11 +2,22 @@
  * POST /api/notify-me
  * Body: { email, deckId, deckName }
  *
- * Adds the email to a Redis set keyed by deckId so we can fan-out
- * restock notifications later.  Requires Vercel KV (free tier).
+ * Stores the subscriber in a Resend Audience called "lotus-waitlist".
+ * firstName is used to record the deckId for filtering on restock.
+ * No separate database needed — Resend is both storage and mailer.
  */
 
-import { kv } from '@vercel/kv';
+import { Resend } from 'resend';
+
+const AUDIENCE_NAME = 'lotus-waitlist';
+
+async function getOrCreateAudienceId(resend) {
+  const result = await resend.audiences.list();
+  const existing = result.data?.data?.find(a => a.name === AUDIENCE_NAME);
+  if (existing) return existing.id;
+  const created = await resend.audiences.create({ name: AUDIENCE_NAME });
+  return created.data?.id;
+}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', process.env.SITE_URL || '*');
@@ -15,24 +26,30 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  if (!process.env.KV_REST_API_URL) {
-    return res.status(503).json({ error: 'Waitlist storage not configured yet.' });
+  if (!process.env.RESEND_API_KEY) {
+    return res.status(503).json({ error: 'Notification service not yet configured.' });
   }
 
   const { email, deckId, deckName } = req.body ?? {};
-
-  if (!email || !deckId) {
-    return res.status(400).json({ error: 'Missing email or deckId.' });
-  }
+  if (!email || !deckId) return res.status(400).json({ error: 'Missing email or deckId.' });
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res.status(400).json({ error: 'Invalid email address.' });
   }
 
   try {
-    // sadd is idempotent — signing up twice only stores once
-    await kv.sadd(`waitlist:${deckId}`, email);
-    // store deck name for use in restock emails
-    await kv.set(`deckname:${deckId}`, deckName ?? '');
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const audienceId = await getOrCreateAudienceId(resend);
+
+    // firstName stores deckId so we can filter on restock.
+    // lastName stores deckName for context.
+    // Resend upserts by email — re-signing up for a deck just updates.
+    await resend.contacts.create({
+      audienceId,
+      email,
+      firstName: String(deckId),
+      lastName: deckName ?? '',
+      unsubscribed: false,
+    });
 
     return res.status(200).json({ ok: true });
   } catch (err) {
