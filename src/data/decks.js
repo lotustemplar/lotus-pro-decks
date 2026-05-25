@@ -148,7 +148,7 @@ export const decks = [
     included: ["99-card Commander deck", "Pilot guide booklet", "Eldrazi token pack", "Counter tracker set", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
     quantity: 1,
-    stripePrice: "price_ULALEK",
+    stripePrice: "price_1Talzp2iRe5T5JCTFNydUzR2",
     ourCost: 0,
   },
   {
