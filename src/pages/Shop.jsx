@@ -130,7 +130,7 @@ export default function Shop({ animationsEnabled }) {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-20">
-        <div className="flex gap-8 items-start">
+        <div className="lg:flex lg:gap-8 lg:items-start">
           <FilterBar filters={filters} onChange={updateFilters} resultCount={filteredDecks.length} />
           <div className="flex-1 min-w-0">
             <DeckGrid decks={filteredDecks} animationsEnabled={animationsEnabled} />
