@@ -592,6 +592,10 @@ export default function Admin() {
   const [orderDirty,    setOrderDirty]    = useState(false);
   const [orderPushing,  setOrderPushing]  = useState(false);
   const [orderPushOk,   setOrderPushOk]   = useState(false);
+  const [deleteDirty,   setDeleteDirty]   = useState(false);
+  const [deletePushing, setDeletePushing] = useState(false);
+  const [deletePushOk,  setDeletePushOk]  = useState(false);
+  const [deletePushErr, setDeletePushErr] = useState('');
   const [waitlistCounts, setWaitlistCounts] = useState({}); // { [deckId]: number }
   const [restockMsg,    setRestockMsg]    = useState('');   // shown after restock send
 
@@ -623,6 +627,9 @@ export default function Admin() {
     if (!window.confirm('Delete this deck?')) return;
     setDeckList(p => p.filter(d => d.id !== id));
     if (editing?.id === id) setEditing(null);
+    setDeleteDirty(true);
+    setDeletePushOk(false);
+    setDeletePushErr('');
   }
   function moveDeck(id, dir) {
     setDeckList(p => {
@@ -649,6 +656,25 @@ export default function Admin() {
       alert('Failed to publish order: ' + err.message);
     } finally {
       setOrderPushing(false);
+    }
+  }
+
+  async function publishDeletion() {
+    if (!ghToken) {
+      alert('Connect a GitHub token first (click the GitHub button in the top bar).');
+      return;
+    }
+    setDeletePushing(true);
+    setDeletePushErr('');
+    try {
+      await pushDecksJs(deckList, ghToken);
+      setDeleteDirty(false);
+      setDeletePushOk(true);
+      setTimeout(() => setDeletePushOk(false), 4000);
+    } catch (err) {
+      setDeletePushErr(err.message);
+    } finally {
+      setDeletePushing(false);
     }
   }
 
@@ -858,6 +884,39 @@ export default function Admin() {
                 {orderPushing
                   ? <><Loader2 size={12} className="animate-spin" /> Publishing…</>
                   : <><Upload size={12} /> Publish Order</>
+                }
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Deletion pending banner */}
+        {(deleteDirty || deletePushOk || deletePushErr) && (
+          <div className={`mb-3 p-3 rounded-xl border text-sm flex items-center justify-between gap-3 transition-colors ${
+            deletePushOk
+              ? 'bg-green-500/8 border-green-500/20 text-green-400'
+              : deletePushErr
+                ? 'bg-red-500/8 border-red-500/20 text-red-400'
+                : 'bg-red-500/10 border-red-500/30 text-red-300'
+          }`}>
+            <div className="flex items-center gap-2">
+              {deletePushOk
+                ? <><Check size={14} className="shrink-0" /> Deletion published — live site updated.</>
+                : deletePushErr
+                  ? <><span className="shrink-0">✗</span> Push failed: {deletePushErr}</>
+                  : <><Trash2 size={14} className="shrink-0" /> Deck deleted locally — not yet removed from live site.</>
+              }
+            </div>
+            {deleteDirty && (
+              <button
+                onClick={publishDeletion}
+                disabled={deletePushing}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500 hover:bg-red-400
+                  text-white text-xs font-semibold transition-colors disabled:opacity-50 shrink-0"
+              >
+                {deletePushing
+                  ? <><Loader2 size={12} className="animate-spin" /> Publishing…</>
+                  : <><Upload size={12} /> Publish Deletion</>
                 }
               </button>
             )}
