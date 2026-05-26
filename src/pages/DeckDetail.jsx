@@ -6,6 +6,7 @@ import { decks, colorMeta } from '../data/decks';
 import ElementalOverlay from '../components/ElementalOverlay';
 import DifficultyMeter from '../components/DifficultyMeter';
 import SEO from '../components/SEO';
+import SleeveUpsellModal from '../components/SleeveUpsellModal';
 
 const TABS = ['Strategy', 'Decklist', 'How to Pilot', 'Upgrade Path', 'Tokens'];
 
@@ -77,8 +78,9 @@ export default function DeckDetail({ animationsEnabled }) {
   // Match by slug first, fall back to numeric id for any old links
   const deck = decks.find(d => d.slug === slug) ?? decks.find(d => d.id === Number(slug));
   const [activeTab, setActiveTab] = useState('Strategy');
-  const [buying, setBuying] = useState(false);
-  const [buyError, setBuyError] = useState(null);
+  const [buying, setBuying]           = useState(false);
+  const [buyError, setBuyError]       = useState(null);
+  const [showSleeve, setShowSleeve]   = useState(false);
 
   // Notify Me state
   const [notifyEmail, setNotifyEmail]   = useState('');
@@ -90,22 +92,37 @@ export default function DeckDetail({ animationsEnabled }) {
 
   if (!deck) return <Navigate to="/shop" replace />;
 
-  const handleBuyNow = async () => {
-    if (!deck.stripePrice || deck.stripePrice.startsWith('price_MEREN') ||
-        deck.stripePrice.startsWith('price_ELSHA') || deck.stripePrice.startsWith('price_KRENKO') ||
-        deck.stripePrice.startsWith('price_RHYS') || deck.stripePrice.startsWith('price_ATRAXA') ||
-        deck.stripePrice.startsWith('price_LIESA') || deck.stripePrice.startsWith('price_TEYSA') ||
-        deck.stripePrice.startsWith('price_ULALEK')) {
+  const isPlaceholderPrice = !deck.stripePrice ||
+    ['price_MEREN','price_ELSHA','price_KRENKO','price_RHYS',
+     'price_ATRAXA','price_LIESA','price_TEYSA','price_ULALEK']
+      .some(p => deck.stripePrice.startsWith(p));
+
+  // Step 1 — open sleeve upsell modal (or skip straight to checkout if not configured)
+  const handleBuyNow = () => {
+    if (isPlaceholderPrice) {
       setBuyError('Checkout not yet configured. Please contact us to order.');
       return;
     }
+    setShowSleeve(true);
+  };
+
+  // Step 2 — called by modal with sleeve choice (or skipped with no sleeve)
+  const handleCheckout = async ({ sleeveOption = 'none', sleeveColor = null, sleevePrice = 0 } = {}) => {
+    setShowSleeve(false);
     setBuying(true);
     setBuyError(null);
     try {
       const res = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId: deck.stripePrice, deckName: deck.name, deckPrice: deck.price }),
+        body: JSON.stringify({
+          priceId: deck.stripePrice,
+          deckName: deck.name,
+          deckPrice: deck.price,
+          sleeveOption,
+          sleeveColor,
+          sleevePrice,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Checkout failed');
@@ -169,6 +186,17 @@ export default function DeckDetail({ animationsEnabled }) {
         type="product"
         jsonLd={jsonLd}
       />
+
+      {/* Sleeve upsell modal */}
+      <AnimatePresence>
+        {showSleeve && (
+          <SleeveUpsellModal
+            onConfirm={handleCheckout}
+            onSkip={() => handleCheckout({ sleeveOption: 'none' })}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Hero banner */}
       <div
         className="relative h-72 sm:h-96 overflow-hidden"
