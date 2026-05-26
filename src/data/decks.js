@@ -27,7 +27,7 @@ export const decks = [
       { section: "Spells & Artifacts (28)", cards: ["Sol Ring","Arcane Signet","Talisman of Dominance","Talisman of Curiosity","Talisman of Impulse","Talisman of Resilience","Hedron Archive","Everflowing Chalice","Mystic Forge","Forsaken Monument","Herald's Horn","Urza's Incubator","Kozilek's Unsealing","Echoes of Eternity","Kozilek's Command","Ugin's Binding","All Is Dust","Eldrazi Confluence","Eldrazi Conscription","Eldritch Immunity","Return of the Wildspeaker","Garruk's Uprising","Warping Wail","Ancient Stirrings","Beast Within","From Beyond","Not of This World","Eldrazi Monument"] },
       { section: "Lands (37)", cards: ["Command Tower","Path of Ancestry","Exotic Orchard","Unclaimed Territory","Secluded Courtyard","Corrupted Crossroads","Eldrazi Temple","Shrine of the Forsaken Gods","Ugin's Labyrinth","Urza's Cave","Spawning Bed","Battlefield Forge","Llanowar Wastes","Brushland","Underground River","Adarkar Wastes","Karplusan Forest","Yavimaya Coast","Sulfurous Springs","Caves of Koilos","Shivan Reef","Bonders' Enclave","Reliquary Tower","Tomb of the Spirit Dragon","Ruins of Oran-Rief","Cascading Cataracts","Tendo Ice Bridge","Opal Palace","Ash Barrens","Twisted Landscape","Tranquil Landscape","Wastes","Plains","Island","Swamp","Mountain","Forest"] }
     ],
-    included: ["99-card Commander deck", "Pilot guide booklet", "Eldrazi token pack", "Counter tracker set", "Upgrade path guide", "Storage sleeve set"],
+    included: ["100-card Commander deck", "Pilot guide booklet", "Eldrazi token pack", "Counter tracker set", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
     premium: true,
     quantity: 1,
