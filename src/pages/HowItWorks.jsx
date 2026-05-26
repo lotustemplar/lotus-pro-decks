@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import SEO from '../components/SEO';
 
 const STEPS = [
   {
@@ -43,6 +44,11 @@ const STEPS = [
 export default function HowItWorks() {
   return (
     <div className="min-h-screen bg-[#0a0e1a] pt-16">
+      <SEO
+        title="How It Works"
+        description="From browsing to your first game — here's how Lotus Pro Decks works. Choose a deck, we ship it ready to play with a pilot guide, strategy card, and synergy cheat sheet."
+        path="/how-it-works"
+      />
       {/* Header */}
       <div className="relative overflow-hidden bg-gradient-to-b from-[#020817] to-[#0a0e1a] py-20">
         <div

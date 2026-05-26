@@ -1,10 +1,16 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import SEO from '../components/SEO';
 
 export default function About() {
   return (
     <div className="min-h-screen bg-[#0a0e1a] pt-16">
+      <SEO
+        title="About Us"
+        description="Lotus Pro Decks builds handcrafted Commander decks for players who want to skip the deckbuilding grind and get straight to playing. Learn about our story and mission."
+        path="/about"
+      />
       <div className="relative overflow-hidden bg-gradient-to-b from-[#020817] to-[#0a0e1a] py-20">
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[250px] rounded-full opacity-10 pointer-events-none"

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Send, CheckCircle } from 'lucide-react';
+import SEO from '../components/SEO';
 
 const TOPICS = [
   'Help Me Choose a Deck',
@@ -21,6 +22,11 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen bg-[#0a0e1a] pt-16">
+      <SEO
+        title="Contact Us"
+        description="Have a question about a deck, your order, or a custom build request? Reach out to the Lotus Pro Decks team — we typically respond within 24 hours."
+        path="/contact"
+      />
       <div className="relative overflow-hidden bg-gradient-to-b from-[#020817] to-[#0a0e1a] py-20">
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] rounded-full opacity-10 pointer-events-none"

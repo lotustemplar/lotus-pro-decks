@@ -8,6 +8,7 @@ import DeckCarousel from '../components/DeckCarousel';
 import WhyProPilot from '../components/WhyProPilot';
 import BracketSection from '../components/BracketSection';
 import CTASection from '../components/CTASection';
+import SEO from '../components/SEO';
 import SurpriseBanner from '../components/SurpriseBanner';
 import { decks, colorMeta } from '../data/decks';
 
@@ -26,6 +27,11 @@ export default function Home({ animationsEnabled }) {
 
   return (
     <div>
+      <SEO
+        title="Expert-Built Commander Decks — Ready to Play Tonight"
+        description="Professionally built Commander decks with pilot guides, synergy breakdowns, and strategy cards. Exclusive, handcrafted builds — never mass-produced and strictly limited."
+        path="/"
+      />
       {/* Full-page logo wallpaper — fixed so it persists as you scroll */}
       <div
         className="fixed inset-0 flex items-center justify-center pointer-events-none select-none"

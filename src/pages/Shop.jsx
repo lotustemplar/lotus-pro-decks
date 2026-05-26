@@ -5,6 +5,7 @@ import DeckGrid from '../components/DeckGrid';
 import SurpriseBanner from '../components/SurpriseBanner';
 import { decks } from '../data/decks';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 const DEFAULT_FILTERS = {
   sort: 'featured',
@@ -69,6 +70,11 @@ export default function Shop({ animationsEnabled }) {
 
   return (
     <div className="min-h-screen bg-[#0a0e1a] pt-20">
+      <SEO
+        title="Shop Commander Decks"
+        description="Browse our full lineup of professionally built Commander decks. Filter by color identity, bracket, playstyle, and budget. Exclusive, handcrafted builds — limited runs only."
+        path="/shop"
+      />
       {/* Page header */}
       <div className="relative overflow-hidden bg-gradient-to-b from-[#020817] to-[#0a0e1a] py-14">
         <div

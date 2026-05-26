@@ -42,7 +42,7 @@ export default async function handler(req, res) {
     if (!subscribers.length) return res.status(200).json({ sent: 0 });
 
     const siteUrl = process.env.SITE_URL || 'https://lotusprodecks.com';
-    const deckUrl = `${siteUrl}/#/deck/${deckId}`;
+    const deckUrl = `${siteUrl}/deck/${deckId}`;
     let sent = 0;
 
     for (const contact of subscribers) {

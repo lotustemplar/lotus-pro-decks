@@ -5,6 +5,7 @@ import { ArrowLeft, ShoppingCart, ChevronDown, ChevronUp, Star, Loader2, Bell, C
 import { decks, colorMeta } from '../data/decks';
 import ElementalOverlay from '../components/ElementalOverlay';
 import DifficultyMeter from '../components/DifficultyMeter';
+import SEO from '../components/SEO';
 
 const TABS = ['Strategy', 'Decklist', 'How to Pilot', 'Upgrade Path', 'Tokens'];
 
@@ -133,8 +134,40 @@ export default function DeckDetail({ animationsEnabled }) {
     }
   };
 
+  const deckImage = deck.image ? `https://lotusprodecks.com${deck.image.replace(/^.*\/images/, '/images')}` : null;
+  const seoDesc = `${deck.description} ${deck.strategy ? deck.strategy.slice(0, 120) + '…' : ''}`.trim();
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: deck.name,
+    description: deck.description,
+    image: deckImage,
+    brand: { '@type': 'Brand', name: 'Lotus Pro Decks' },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'USD',
+      price: String(deck.price),
+      availability: soldOut ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
+      url: `https://lotusprodecks.com/deck/${deck.id}`,
+      seller: { '@type': 'Organization', name: 'Lotus Pro Decks' },
+    },
+    additionalProperty: [
+      { '@type': 'PropertyValue', name: 'Commander', value: deck.commander },
+      { '@type': 'PropertyValue', name: 'Bracket', value: String(deck.bracket) },
+      { '@type': 'PropertyValue', name: 'Color Identity', value: deck.colorLabel },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0e1a] pt-16">
+      <SEO
+        title={`${deck.name} — ${deck.colorLabel} Commander Deck`}
+        description={seoDesc}
+        image={deckImage}
+        path={`/deck/${deck.id}`}
+        type="product"
+        jsonLd={jsonLd}
+      />
       {/* Hero banner */}
       <div
         className="relative h-72 sm:h-96 overflow-hidden"

@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import Nav from './components/Nav';
 import Home from './pages/Home';
@@ -39,8 +39,8 @@ export default function App() {
   const [animationsEnabled, setAnimationsEnabled] = useState(true);
 
   return (
-    <HashRouter>
+    <BrowserRouter>
       <AppInner animationsEnabled={animationsEnabled} setAnimationsEnabled={setAnimationsEnabled} />
-    </HashRouter>
+    </BrowserRouter>
   );
 }

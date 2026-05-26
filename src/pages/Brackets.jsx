@@ -2,10 +2,16 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import BracketSection from '../components/BracketSection';
 import { ArrowRight } from 'lucide-react';
+import SEO from '../components/SEO';
 
 export default function Brackets() {
   return (
     <div className="min-h-screen bg-[#0a0e1a] pt-16">
+      <SEO
+        title="Commander Brackets Explained"
+        description="Understand Commander brackets 1–4 and how they set table expectations before you sit down. Learn which bracket each Lotus Pro Deck targets and why."
+        path="/brackets"
+      />
       <div className="relative overflow-hidden bg-gradient-to-b from-[#020817] to-[#0a0e1a] py-20">
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] rounded-full opacity-10 pointer-events-none"
