@@ -33,49 +33,49 @@
     <priority>0.5</priority>
   </url>
 
-  <!-- Deck pages -->
+  <!-- Commander Deck pages -->
   <url>
-    <loc>https://lotusprodecks.com/deck/meren-graveyard-engine</loc>
+    <loc>https://lotusprodecks.com/deck/meren-graveyard-engine-commander-deck</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/krenko-goblin-blitz</loc>
+    <loc>https://lotusprodecks.com/deck/krenko-goblin-blitz-commander-deck</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/teysa-clue-aristocrats</loc>
+    <loc>https://lotusprodecks.com/deck/teysa-clue-aristocrats-commander-deck</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/ulalek-eldrazi-dominance</loc>
+    <loc>https://lotusprodecks.com/deck/ulalek-eldrazi-dominance-commander-deck</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/tatyova-landfall-engine</loc>
+    <loc>https://lotusprodecks.com/deck/tatyova-landfall-engine-commander-deck</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/elsha-storm-cannon</loc>
+    <loc>https://lotusprodecks.com/deck/elsha-storm-cannon-commander-deck</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/rhys-token-swarm</loc>
+    <loc>https://lotusprodecks.com/deck/rhys-token-swarm-commander-deck</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/atraxa-proliferate</loc>
+    <loc>https://lotusprodecks.com/deck/atraxa-proliferate-commander-deck</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/liesa-lifegain-control</loc>
+    <loc>https://lotusprodecks.com/deck/liesa-lifegain-control-commander-deck</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

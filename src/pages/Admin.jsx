@@ -45,7 +45,9 @@ const REPO_NAME  = 'lotus-pro-decks';
 
 function colorKey(c) { return [...c].sort().join(','); }
 function toSlug(name) {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const base = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  // Append -commander-deck if not already present — boosts SEO for deck URLs
+  return base.endsWith('-commander-deck') ? base : `${base}-commander-deck`;
 }
 function deriveColorMeta(colors) {
   if (!colors.length) return { accentColor: '#6366f1', gradientFrom: '#0a0a1a', gradientTo: '#1a0a1a', glowClass: 'glow-purple', colorLabel: 'Colorless' };

@@ -136,7 +136,7 @@ export default function DeckDetail({ animationsEnabled }) {
   };
 
   const deckImage = deck.image ? `https://lotusprodecks.com${deck.image.replace(/^.*\/images/, '/images')}` : null;
-  const seoDesc = `${deck.description} ${deck.strategy ? deck.strategy.slice(0, 120) + '…' : ''}`.trim();
+  const seoDesc = `${deck.name} — a ready-to-play ${deck.colorLabel} Commander deck built around ${deck.commander}. ${deck.description} Better than a precon: comes with a pilot guide, upgrade path, and full synergy breakdown. $${deck.price}.`;
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -162,7 +162,7 @@ export default function DeckDetail({ animationsEnabled }) {
   return (
     <div className="min-h-screen bg-[#0a0e1a] pt-16">
       <SEO
-        title={`${deck.name} — ${deck.colorLabel} Commander Deck`}
+        title={`${deck.name} — ${deck.colorLabel} Commander Deck | Buy Ready-to-Play`}
         description={seoDesc}
         image={deckImage}
         path={`/deck/${deck.slug ?? deck.id}`}

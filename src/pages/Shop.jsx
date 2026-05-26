@@ -71,8 +71,8 @@ export default function Shop({ animationsEnabled }) {
   return (
     <div className="min-h-screen bg-[#0a0e1a] pt-20">
       <SEO
-        title="Shop Commander Decks"
-        description="Browse our full lineup of professionally built Commander decks. Filter by color identity, bracket, playstyle, and budget. Exclusive, handcrafted builds — limited runs only."
+        title="Buy Commander Decks — Ready-to-Play, Better Than Precons"
+        description="Shop handcrafted Commander decks that are ready to play tonight. A serious upgrade over precons — every build includes a pilot guide, upgrade path, and synergy breakdown. Limited runs, never mass-produced."
         path="/shop"
       />
       {/* Page header */}
@@ -102,10 +102,10 @@ export default function Shop({ animationsEnabled }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-gray-400 max-w-lg mx-auto mb-5"
+            className="text-gray-400 max-w-xl mx-auto mb-5"
           >
-            Every deck is professionally built, synergy-checked, and ready to play tonight.
-            These are <span className="text-white font-medium">exclusive, handcrafted builds</span> — never mass-produced and strictly limited.
+            Every deck is professionally built, synergy-checked, and{' '}
+            <span className="text-white font-medium">ready to play tonight</span>. Think of these as the commander deck precon upgrades you always wanted — fully tuned, cohesive builds with a real strategy. Exclusive, handcrafted, and strictly limited.
           </motion.p>
 
           {/* Exclusivity badges */}
@@ -126,6 +126,17 @@ export default function Shop({ animationsEnabled }) {
                 <span>{b.icon}</span> {b.text}
               </div>
             ))}
+          </motion.div>
+
+          {/* SEO-rich precon comparison blurb */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="max-w-2xl mx-auto mb-5 px-4 py-3 rounded-xl bg-white/3 border border-white/8 text-xs text-gray-500 leading-relaxed"
+          >
+            <span className="text-gray-400 font-semibold">Not your average Commander precon.</span>{' '}
+            Every Lotus Pro Deck is hand-tuned with a clear win condition, real synergy, and an upgrade path — so you can grow the deck over time. Whether you're looking for a budget commander deck, a competitive upgrade over a precon, or a focused ready-to-play build, you're in the right place.
           </motion.div>
 
           <div className="flex justify-center">

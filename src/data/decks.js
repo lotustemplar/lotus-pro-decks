@@ -33,7 +33,7 @@ export const decks = [
     quantity: 1,
     stripePrice: "price_1TamQJ2iRe5T5JCTZNkhwweA",
     ourCost: 200,
-    slug: "ulalek-eldrazi-dominance",
+    slug: "ulalek-eldrazi-dominance-commander-deck",
   },
   {
     id: 1,
@@ -76,7 +76,7 @@ export const decks = [
     quantity: 1,
     stripePrice: "price_1Talvd2iRe5T5JCTuJhZW0ha",
     ourCost: 47,
-    slug: "meren-graveyard-engine",
+    slug: "meren-graveyard-engine-commander-deck",
   },
   {
     id: 4,
@@ -116,7 +116,7 @@ export const decks = [
     quantity: 1,
     stripePrice: "price_1TamI72iRe5T5JCT7hvP6Tnb",
     ourCost: 82.01,
-    slug: "krenko-goblin-blitz",
+    slug: "krenko-goblin-blitz-commander-deck",
   },
   {
     id: 7,
@@ -157,7 +157,7 @@ export const decks = [
     quantity: 1,
     stripePrice: "price_1TamAh2iRe5T5JCTEBim7YuM",
     ourCost: 73,
-    slug: "teysa-clue-aristocrats",
+    slug: "teysa-clue-aristocrats-commander-deck",
   },
   {
     id: 9,
@@ -198,7 +198,7 @@ export const decks = [
     quantity: 1,
     stripePrice: "price_1Tb2Ik2iRe5T5JCTVT5T3ii3",
     ourCost: 61,
-    slug: "tatyova-landfall-engine",
+    slug: "tatyova-landfall-engine-commander-deck",
   },
   {
     id: 2,
@@ -235,7 +235,7 @@ export const decks = [
     quantity: 10,
     stripePrice: "price_ELSHA",
     ourCost: 0,
-    slug: "elsha-storm-cannon",
+    slug: "elsha-storm-cannon-commander-deck",
   },
   {
     id: 3,
@@ -273,7 +273,7 @@ export const decks = [
     quantity: 10,
     stripePrice: "price_RHYS",
     ourCost: 0,
-    slug: "rhys-token-swarm",
+    slug: "rhys-token-swarm-commander-deck",
   },
   {
     id: 5,
@@ -311,7 +311,7 @@ export const decks = [
     quantity: 10,
     stripePrice: "price_ATRAXA",
     ourCost: 0,
-    slug: "atraxa-proliferate",
+    slug: "atraxa-proliferate-commander-deck",
   },
   {
     id: 6,
@@ -349,7 +349,7 @@ export const decks = [
     quantity: 10,
     stripePrice: "price_LIESA",
     ourCost: 0,
-    slug: "liesa-lifegain-control",
+    slug: "liesa-lifegain-control-commander-deck",
   }
 ];
 

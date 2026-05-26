@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 const SITE_NAME = 'Lotus Pro Decks';
 const SITE_URL  = 'https://lotusprodecks.com';
-const DEFAULT_DESC = 'Professionally built Commander decks with simple pilot guides, synergy explanations, and ready-to-play decklists. Exclusive, handcrafted builds — never mass-produced.';
+const DEFAULT_DESC = 'Expert-built Commander decks that are ready to play out of the box. Better than precons — handcrafted builds with pilot guides, upgrade paths, and full synergy breakdowns. Not mass-produced.';
 const DEFAULT_IMAGE = `${SITE_URL}/images/og-default.png`;
 
 export default function SEO({

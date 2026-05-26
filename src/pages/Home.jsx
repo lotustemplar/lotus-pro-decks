@@ -28,9 +28,24 @@ export default function Home({ animationsEnabled }) {
   return (
     <div>
       <SEO
-        title="Expert-Built Commander Decks — Ready to Play Tonight"
-        description="Professionally built Commander decks with pilot guides, synergy breakdowns, and strategy cards. Exclusive, handcrafted builds — never mass-produced and strictly limited."
+        title="Expert-Built Commander Decks — The Precon Upgrade You've Been Looking For"
+        description="Handcrafted Commander decks that are ready to play out of the box — a serious upgrade over commander precons. Every deck includes a pilot guide, upgrade path, and full synergy breakdown. Limited runs, never mass-produced."
         path="/"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: 'Lotus Pro Decks',
+          url: 'https://lotusprodecks.com',
+          description: 'Expert-built Commander decks — a serious upgrade over precons. Ready to play, handcrafted, limited runs.',
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: {
+              '@type': 'EntryPoint',
+              urlTemplate: 'https://lotusprodecks.com/shop',
+            },
+            'query-input': 'required name=search_term_string',
+          },
+        }}
       />
       {/* Full-page logo wallpaper — fixed so it persists as you scroll */}
       <div
@@ -134,6 +149,55 @@ export default function Home({ animationsEnabled }) {
       </section>
 
       <SurpriseBanner variant="section" />
+
+      {/* SEO keyword section — precon comparison */}
+      <section className="py-16 bg-[#020817]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-2xl sm:text-3xl font-display font-bold text-white mb-4"
+          >
+            The Commander Deck Upgrade You've Been Looking For
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-gray-400 leading-relaxed mb-6 max-w-2xl mx-auto"
+          >
+            Tired of commander precons that feel unfocused or fall apart mid-game?
+            Lotus Pro Decks are fully tuned, ready-to-play Commander decks built around
+            a single powerful strategy — not a hodgepodge of reprint cards.
+            Each deck comes with a <span className="text-white font-medium">pilot guide</span>,{' '}
+            <span className="text-white font-medium">upgrade path</span>, and{' '}
+            <span className="text-white font-medium">synergy breakdown</span>{' '}
+            so you understand exactly how to win from turn one.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="flex flex-wrap justify-center gap-4 text-sm"
+          >
+            {[
+              { label: 'Commander Deck Precon Alternative', icon: '⚔️' },
+              { label: 'Commander Deck Upgrade', icon: '📈' },
+              { label: 'Ready-to-Play Build', icon: '🚀' },
+              { label: 'Budget Commander Decks', icon: '💰' },
+            ].map(b => (
+              <div key={b.label} className="flex items-center gap-2 px-4 py-2 rounded-full
+                bg-white/5 border border-white/10 text-gray-300 font-medium">
+                <span>{b.icon}</span> {b.label}
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
       <WhyProPilot />
       <BracketSection />
       <CTASection animationsEnabled={animationsEnabled} />
