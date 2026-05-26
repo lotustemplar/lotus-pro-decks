@@ -1255,6 +1255,17 @@ export default function Admin() {
                 <TextArea label="Opening Hand Tips" value={editing.openingHand} onChange={v => set('openingHand', v)} rows={3} />
                 <TextArea label="Upgrade Path" value={editing.upgradePath} onChange={v => set('upgradePath', v)} rows={3} />
                 <TextArea label="Tokens Needed" value={editing.tokensNeeded} onChange={v => set('tokensNeeded', v)} rows={2} />
+                <div>
+                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">What's Included <span className="text-gray-600 normal-case font-normal">(one item per line)</span></label>
+                  <textarea
+                    value={(editing.included || []).join('\n')}
+                    onChange={e => set('included', e.target.value.split('\n').map(l => l.trim()).filter(Boolean))}
+                    rows={5}
+                    placeholder={"99-card Commander deck\nPilot guide booklet\nSynergy cheat sheet\nUpgrade path guide\nStorage sleeve set"}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-white text-sm
+                      placeholder-gray-600 focus:outline-none focus:border-blue-500 leading-relaxed resize-none transition-colors"
+                  />
+                </div>
               </div>
             )}
 

@@ -8,7 +8,7 @@ import DifficultyMeter from '../components/DifficultyMeter';
 import SEO from '../components/SEO';
 import SleeveUpsellModal from '../components/SleeveUpsellModal';
 
-const TABS = ['Strategy', 'Decklist', 'How to Pilot', 'Upgrade Path', 'Tokens'];
+const TABS = ['Strategy', 'Decklist', 'How to Pilot'];
 
 const TRUST_BADGES = [
   { icon: '🛡️', label: 'Professionally Built' },
@@ -44,7 +44,7 @@ function Tab({ active, onClick, label }) {
 }
 
 function Section({ title, children }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   return (
     <div className="mb-4 rounded-xl border border-white/8 overflow-hidden">
       <button
@@ -368,22 +368,6 @@ export default function DeckDetail({ animationsEnabled }) {
                   </Section>
                 )}
 
-                {activeTab === 'Upgrade Path' && (
-                  <Section title="Upgrade Path">
-                    <p className="pt-3">{deck.upgradePath}</p>
-                    <div className="mt-4 p-3 rounded-xl" style={{ background: `${deck.accentColor}0d`, border: `1px solid ${deck.accentColor}22` }}>
-                      <div className="text-xs font-bold mb-2" style={{ color: deck.accentColor }}>Pro Tip</div>
-                      <div className="text-xs text-gray-400">Always upgrade the mana base first — consistent lands make every deck stronger before any single card does.</div>
-                    </div>
-                  </Section>
-                )}
-
-                {activeTab === 'Tokens' && (
-                  <Section title="Tokens Needed">
-                    <p className="pt-3">{deck.tokensNeeded}</p>
-                    <p className="text-xs text-gray-500 mt-3">Tokens are not included in the deck — they can be found at most local game stores or printed from online resources.</p>
-                  </Section>
-                )}
               </motion.div>
             </AnimatePresence>
           </div>

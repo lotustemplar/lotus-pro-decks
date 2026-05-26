@@ -151,11 +151,12 @@ export default function SleeveUpsellModal({ onConfirm, onSkip }) {
         exit={{   scale: 0.93, y: 28  }}
         transition={{ type: 'spring', stiffness: 300, damping: 28 }}
         className="relative z-10 w-full max-w-2xl rounded-2xl border border-white/10
-          bg-[#0d1220] shadow-2xl overflow-hidden"
+          bg-[#0d1220] shadow-2xl flex flex-col"
+        style={{ maxHeight: '92dvh' }}
         onClick={e => e.stopPropagation()}
       >
         {/* ── Header ── */}
-        <div className="flex items-start justify-between px-6 pt-5 pb-4 border-b border-white/8">
+        <div className="flex items-start justify-between px-6 pt-5 pb-4 border-b border-white/8 flex-shrink-0">
           <div>
             <div className="font-display font-bold text-white text-lg leading-tight">
               🛡️ Protect Your New Deck
@@ -171,6 +172,9 @@ export default function SleeveUpsellModal({ onConfirm, onSkip }) {
             <X size={18} />
           </button>
         </div>
+
+        {/* ── Scrollable body ── */}
+        <div className="overflow-y-auto flex-1">
 
         {/* ── Option cards ── */}
         <div className="px-6 py-5 grid sm:grid-cols-2 gap-4">
@@ -274,8 +278,10 @@ export default function SleeveUpsellModal({ onConfirm, onSkip }) {
           )}
         </AnimatePresence>
 
-        {/* ── Footer actions ── */}
-        <div className="px-6 pb-5 flex gap-3 border-t border-white/6 pt-4">
+        </div>{/* end scrollable body */}
+
+        {/* ── Footer actions — always visible, never scrolls away ── */}
+        <div className="px-6 pb-5 pt-4 flex gap-3 border-t border-white/8 flex-shrink-0 bg-[#0d1220]">
           <button
             onClick={onSkip}
             className="flex-1 py-2.5 rounded-xl text-sm font-medium
