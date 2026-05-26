@@ -3,16 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 
 export const SLEEVE_COLORS = [
-  { name: 'Black',      hex: '#111111' },
-  { name: 'White',      hex: '#f0f0ef' },
-  { name: 'Red',        hex: '#dc2626' },
-  { name: 'Blue',       hex: '#1d4ed8' },
-  { name: 'Sky Blue',   hex: '#38bdf8' },
-  { name: 'Orange',     hex: '#ea580c' },
-  { name: 'Pink',       hex: '#ec4899' },
-  { name: 'Yellow',     hex: '#d97706' },
-  { name: 'Lime Green', hex: '#65a30d' },
-  { name: 'Purple',     hex: '#7c3aed' },
+  { name: 'Kuro Eclipse', hex: '#0e0e0e' },
+  { name: 'Gin Mist',     hex: '#b8bec7' },
+  { name: 'Shiro Bloom',  hex: '#f2f0eb' },
+  { name: 'Mori Jade',    hex: '#2d7a4f' },
+  { name: 'Sora Wave',    hex: '#5aaddc' },
+  { name: 'Aka Ember',    hex: '#cc2b2b' },
 ];
 
 /* ── Single-sleeve SVG illustration ─────────────────────────────────────────
