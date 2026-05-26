@@ -63,58 +63,93 @@ function SingleSleeveSVG() {
 }
 
 /* ── Double-sleeve SVG illustration ─────────────────────────────────────────
-   Layer 1 (innermost): card back
-   Layer 2: clear Perfect Fit inner sleeve — snug around the card
-   Layer 3: outer sleeve with colored opaque back, open at the top
-   The colored back is visible at the sides and bottom.
+   3-quarter perspective: colored BACK panel offset behind the clear FRONT panel
+   so the full solid color is unmistakably visible as the back of the sleeve.
+
+   Draw order (back → front):
+   1. Colored back panel — fully filled, offset down-left
+   2. Connecting side + bottom edges (make it look like one sleeve)
+   3. Clear front panel with inner sleeve + card visible through it
 */
 function DoubleSleeveSVG({ color = '#1a1a2e' }) {
-  // Derive a slightly lighter shade for the spine edge
-  return (
-    <svg viewBox="0 0 160 220" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-xl">
-      {/* ── Outer sleeve (colored) ── */}
-      {/* Colored back visible at sides and bottom */}
-      <rect x="8" y="6" width="144" height="208" rx="11" fill={color} />
-      {/* Outer sleeve border */}
-      <rect x="8" y="6" width="144" height="208" rx="11"
-        fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" />
-      {/* Gloss sheen on outer sleeve */}
-      <rect x="8" y="6" width="44" height="208" rx="11"
-        fill="rgba(255,255,255,0.07)" />
-      {/* Outer sleeve top open lip */}
-      <path d="M8 6 Q80 2 152 6" stroke="rgba(255,255,255,0.3)" strokeWidth="1" fill="none" />
+  // Offset amount for the 3D perspective shift
+  const dx = 14, dy = 14;
+  // Back panel coords
+  const bx = 6, by = 6, bw = 126, bh = 188;
+  // Front panel coords (shifted dx right, dy up)
+  const fx = bx + dx, fy = by - dy, fw = bw, fh = bh;
 
-      {/* ── Inner clear sleeve ── */}
-      <rect x="15" y="11" width="130" height="198" rx="8"
-        fill="rgba(180,220,255,0.06)" stroke="rgba(180,220,255,0.35)" strokeWidth="1" />
-      {/* Inner sleeve gloss */}
-      <rect x="15" y="11" width="36" height="198" rx="8"
-        fill="rgba(255,255,255,0.03)" />
+  return (
+    <svg viewBox="0 0 170 222" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-xl">
+
+      {/* ── 1. BACK panel — fully solid color ── */}
+      <rect x={bx} y={by} width={bw} height={bh} rx="9" fill={color} />
+      {/* Subtle gloss on back panel */}
+      <rect x={bx} y={by} width={bw * 0.35} height={bh} rx="9"
+        fill="rgba(255,255,255,0.07)" />
+      {/* Back panel border */}
+      <rect x={bx} y={by} width={bw} height={bh} rx="9"
+        fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+
+      {/* ── 2. Connecting edges (side faces of the sleeve) ── */}
+      {/* Top face */}
+      <polygon
+        points={`${bx},${by} ${bx+bw},${by} ${fx+fw},${fy} ${fx},${fy}`}
+        fill={color} opacity="0.55"
+        stroke="rgba(255,255,255,0.12)" strokeWidth="0.8"
+      />
+      {/* Right face */}
+      <polygon
+        points={`${bx+bw},${by} ${bx+bw},${by+bh} ${fx+fw},${fy+fh} ${fx+fw},${fy}`}
+        fill={color} opacity="0.4"
+        stroke="rgba(255,255,255,0.10)" strokeWidth="0.8"
+      />
+      {/* Bottom face */}
+      <polygon
+        points={`${bx},${by+bh} ${bx+bw},${by+bh} ${fx+fw},${fy+fh} ${fx},${fy+fh}`}
+        fill={color} opacity="0.3"
+        stroke="rgba(255,255,255,0.10)" strokeWidth="0.8"
+      />
+
+      {/* ── 3. FRONT panel — clear outer sleeve ── */}
+      <rect x={fx} y={fy} width={fw} height={fh} rx="9"
+        fill="rgba(180,220,255,0.07)" stroke="rgba(180,220,255,0.45)" strokeWidth="1.5" />
+      {/* Front gloss strip */}
+      <rect x={fx} y={fy} width={fw * 0.30} height={fh} rx="9"
+        fill="rgba(255,255,255,0.04)" />
+      {/* Open top edge */}
+      <line x1={fx} y1={fy} x2={fx+fw} y2={fy}
+        stroke="rgba(200,240,255,0.55)" strokeWidth="1" />
+
+      {/* ── Inner clear sleeve (inside front panel) ── */}
+      <rect x={fx+4} y={fy+3} width={fw-8} height={fh-6} rx="7"
+        fill="rgba(180,220,255,0.04)" stroke="rgba(180,220,255,0.28)" strokeWidth="1" />
 
       {/* ── Card back ── */}
-      <rect x="19" y="14" width="122" height="192" rx="7" fill="#14213d" />
-      <rect x="23" y="18" width="114" height="184" rx="5"
-        fill="none" stroke="#1e3a6e" strokeWidth="1.2" />
-      <rect x="29" y="24" width="102" height="172" rx="4"
-        fill="none" stroke="#1a3060" strokeWidth="0.8" />
-      <path d="M80 43 L118 107 L80 171 L42 107 Z"
-        fill="none" stroke="#1e3a6e" strokeWidth="1.2" />
-      <circle cx="80" cy="107" r="22"
-        fill="none" stroke="#1e3a6e" strokeWidth="1.2" />
-      <ellipse cx="80" cy="107" rx="11" ry="7"
-        fill="none" stroke="#253f7a" strokeWidth="0.8" />
-      {[[33,28],[119,28],[33,185],[119,185]].map(([cx,cy],i) => (
-        <circle key={i} cx={cx} cy={cy} r="3" fill="none" stroke="#1e3a6e" strokeWidth="0.8" />
+      <rect x={fx+7} y={fy+5} width={fw-14} height={fh-10} rx="6" fill="#14213d" />
+      <rect x={fx+11} y={fy+9} width={fw-22} height={fh-18} rx="4"
+        fill="none" stroke="#1e3a6e" strokeWidth="1.1" />
+      <rect x={fx+16} y={fy+14} width={fw-32} height={fh-28} rx="3"
+        fill="none" stroke="#1a3060" strokeWidth="0.7" />
+      {/* Diamond */}
+      <path d={`M${fx+fw/2} ${fy+28} L${fx+fw-20} ${fy+fh/2} L${fx+fw/2} ${fy+fh-28} L${fx+20} ${fy+fh/2} Z`}
+        fill="none" stroke="#1e3a6e" strokeWidth="1.1" />
+      {/* Center circle */}
+      <circle cx={fx+fw/2} cy={fy+fh/2} r="18"
+        fill="none" stroke="#1e3a6e" strokeWidth="1.1" />
+      {/* Corner pips */}
+      {[
+        [fx+13, fy+13],
+        [fx+fw-13, fy+13],
+        [fx+13, fy+fh-13],
+        [fx+fw-13, fy+fh-13],
+      ].map(([cx,cy],i) => (
+        <circle key={i} cx={cx} cy={cy} r="2.5" fill="none" stroke="#1e3a6e" strokeWidth="0.8" />
       ))}
 
-      {/* Layer call-out lines on the right */}
-      <line x1="152" y1="55"  x2="162" y2="55"  stroke="rgba(255,255,255,0.25)" strokeWidth="0.8" />
-      <line x1="145" y1="75"  x2="162" y2="75"  stroke="rgba(180,220,255,0.35)" strokeWidth="0.8" />
-      <line x1="141" y1="95"  x2="162" y2="95"  stroke="rgba(100,160,255,0.3)"  strokeWidth="0.8" />
-
-      {/* Sleeve label */}
-      <text x="80" y="217" textAnchor="middle"
-        fill="rgba(200,220,255,0.5)" fontSize="8.5" fontFamily="system-ui,sans-serif" letterSpacing="0.3">
+      {/* ── Labels ── */}
+      <text x="85" y="213" textAnchor="middle"
+        fill="rgba(200,220,255,0.5)" fontSize="8" fontFamily="system-ui,sans-serif" letterSpacing="0.3">
         Perfect Fit Inner · Premium Outer
       </text>
     </svg>
