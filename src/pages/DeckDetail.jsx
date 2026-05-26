@@ -105,7 +105,7 @@ export default function DeckDetail({ animationsEnabled }) {
       const res = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId: deck.stripePrice, deckName: deck.name }),
+        body: JSON.stringify({ priceId: deck.stripePrice, deckName: deck.name, deckPrice: deck.price }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Checkout failed');
