@@ -199,7 +199,7 @@ export default function DeckCard({ deck, animationsEnabled }) {
           <div className="flex gap-2">
             {soldOut ? (
               <Link
-                to={`/deck/${deck.id}`}
+                to={`/deck/${deck.slug ?? deck.id}`}
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-semibold
                   text-white transition-all duration-200 bg-white/8 border border-white/15 hover:bg-white/12"
               >
@@ -207,7 +207,7 @@ export default function DeckCard({ deck, animationsEnabled }) {
               </Link>
             ) : (
               <Link
-                to={`/deck/${deck.id}`}
+                to={`/deck/${deck.slug ?? deck.id}`}
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-semibold
                   text-white transition-all duration-200"
                 style={{
@@ -286,7 +286,7 @@ export default function DeckCard({ deck, animationsEnabled }) {
 
               <div className="flex gap-3">
                 <Link
-                  to={`/deck/${deck.id}`}
+                  to={`/deck/${deck.slug ?? deck.id}`}
                   className="flex-1 text-center py-2 rounded-xl text-sm font-semibold text-white"
                   style={{ background: `linear-gradient(135deg, ${deck.accentColor}, ${deck.accentColor}99)` }}
                   onClick={() => setShowQuick(false)}

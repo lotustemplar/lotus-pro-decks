@@ -73,8 +73,9 @@ function Section({ title, children }) {
 }
 
 export default function DeckDetail({ animationsEnabled }) {
-  const { id } = useParams();
-  const deck = decks.find(d => d.id === Number(id));
+  const { slug } = useParams();
+  // Match by slug first, fall back to numeric id for any old links
+  const deck = decks.find(d => d.slug === slug) ?? decks.find(d => d.id === Number(slug));
   const [activeTab, setActiveTab] = useState('Strategy');
   const [buying, setBuying] = useState(false);
   const [buyError, setBuyError] = useState(null);
@@ -148,7 +149,7 @@ export default function DeckDetail({ animationsEnabled }) {
       priceCurrency: 'USD',
       price: String(deck.price),
       availability: soldOut ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
-      url: `https://lotusprodecks.com/deck/${deck.id}`,
+      url: `https://lotusprodecks.com/deck/${deck.slug ?? deck.id}`,
       seller: { '@type': 'Organization', name: 'Lotus Pro Decks' },
     },
     additionalProperty: [
@@ -164,7 +165,7 @@ export default function DeckDetail({ animationsEnabled }) {
         title={`${deck.name} — ${deck.colorLabel} Commander Deck`}
         description={seoDesc}
         image={deckImage}
-        path={`/deck/${deck.id}`}
+        path={`/deck/${deck.slug ?? deck.id}`}
         type="product"
         jsonLd={jsonLd}
       />

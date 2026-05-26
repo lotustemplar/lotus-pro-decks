@@ -33,6 +33,7 @@ export const decks = [
     quantity: 1,
     stripePrice: "price_1TamQJ2iRe5T5JCTZNkhwweA",
     ourCost: 200,
+    slug: "ulalek-eldrazi-dominance",
   },
   {
     id: 1,
@@ -75,6 +76,7 @@ export const decks = [
     quantity: 1,
     stripePrice: "price_1Talvd2iRe5T5JCTuJhZW0ha",
     ourCost: 47,
+    slug: "meren-graveyard-engine",
   },
   {
     id: 4,
@@ -114,6 +116,7 @@ export const decks = [
     quantity: 1,
     stripePrice: "price_1TamI72iRe5T5JCT7hvP6Tnb",
     ourCost: 82.01,
+    slug: "krenko-goblin-blitz",
   },
   {
     id: 7,
@@ -154,6 +157,7 @@ export const decks = [
     quantity: 1,
     stripePrice: "price_1TamAh2iRe5T5JCTEBim7YuM",
     ourCost: 73,
+    slug: "teysa-clue-aristocrats",
   },
   {
     id: 9,
@@ -194,6 +198,7 @@ export const decks = [
     quantity: 1,
     stripePrice: "price_1Tb2Ik2iRe5T5JCTVT5T3ii3",
     ourCost: 61,
+    slug: "tatyova-landfall-engine",
   },
   {
     id: 2,
@@ -230,6 +235,7 @@ export const decks = [
     quantity: 10,
     stripePrice: "price_ELSHA",
     ourCost: 0,
+    slug: "elsha-storm-cannon",
   },
   {
     id: 3,
@@ -267,6 +273,7 @@ export const decks = [
     quantity: 10,
     stripePrice: "price_RHYS",
     ourCost: 0,
+    slug: "rhys-token-swarm",
   },
   {
     id: 5,
@@ -304,6 +311,7 @@ export const decks = [
     quantity: 10,
     stripePrice: "price_ATRAXA",
     ourCost: 0,
+    slug: "atraxa-proliferate",
   },
   {
     id: 6,
@@ -341,6 +349,7 @@ export const decks = [
     quantity: 10,
     stripePrice: "price_LIESA",
     ourCost: 0,
+    slug: "liesa-lifegain-control",
   }
 ];
 

@@ -35,47 +35,47 @@
 
   <!-- Deck pages -->
   <url>
-    <loc>https://lotusprodecks.com/deck/1</loc>
+    <loc>https://lotusprodecks.com/deck/meren-graveyard-engine</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/4</loc>
+    <loc>https://lotusprodecks.com/deck/krenko-goblin-blitz</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/7</loc>
+    <loc>https://lotusprodecks.com/deck/teysa-clue-aristocrats</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/8</loc>
+    <loc>https://lotusprodecks.com/deck/ulalek-eldrazi-dominance</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/9</loc>
+    <loc>https://lotusprodecks.com/deck/tatyova-landfall-engine</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/2</loc>
+    <loc>https://lotusprodecks.com/deck/elsha-storm-cannon</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/3</loc>
+    <loc>https://lotusprodecks.com/deck/rhys-token-swarm</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/5</loc>
+    <loc>https://lotusprodecks.com/deck/atraxa-proliferate</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://lotusprodecks.com/deck/6</loc>
+    <loc>https://lotusprodecks.com/deck/liesa-lifegain-control</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

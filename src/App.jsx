@@ -22,7 +22,7 @@ function AppInner({ animationsEnabled, setAnimationsEnabled }) {
       <Routes>
         <Route path="/" element={<Home animationsEnabled={animationsEnabled} />} />
         <Route path="/shop" element={<Shop animationsEnabled={animationsEnabled} />} />
-        <Route path="/deck/:id" element={<DeckDetail animationsEnabled={animationsEnabled} />} />
+        <Route path="/deck/:slug" element={<DeckDetail animationsEnabled={animationsEnabled} />} />
         <Route path="/how-it-works" element={<HowItWorks />} />
         <Route path="/brackets" element={<Brackets />} />
         <Route path="/about" element={<About />} />

@@ -119,7 +119,7 @@ export default function Hero({ animationsEnabled }) {
                 style={{ x: offsetX, rotate: rotation }}
                 {...(animationsEnabled ? floatVariants[i] : {})}
               >
-                <Link to={`/deck/${deck.id}`}>
+                <Link to={`/deck/${deck.slug ?? deck.id}`}>
                   {/* 1:1 square card */}
                   <div
                     className={`relative overflow-hidden rounded-2xl cursor-pointer deck-card-hover

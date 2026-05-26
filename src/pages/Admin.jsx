@@ -44,6 +44,9 @@ const REPO_OWNER = 'lotustemplar';
 const REPO_NAME  = 'lotus-pro-decks';
 
 function colorKey(c) { return [...c].sort().join(','); }
+function toSlug(name) {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
 function deriveColorMeta(colors) {
   if (!colors.length) return { accentColor: '#6366f1', gradientFrom: '#0a0a1a', gradientTo: '#1a0a1a', glowClass: 'glow-purple', colorLabel: 'Colorless' };
   if (colors.length === 1 && colors[0] === 'colorless') return { accentColor: '#9ca3af', gradientFrom: '#1a1a1a', gradientTo: '#0d0d0d', glowClass: 'glow-gray', colorLabel: 'Colorless' };
@@ -152,6 +155,7 @@ function generateDecksJs(deckList) {
     quantity: ${deck.quantity ?? 10},
     stripePrice: ${JSON.stringify(deck.stripePrice || '')},
     ourCost: ${deck.ourCost ?? 0},
+    slug: ${JSON.stringify(deck.slug || toSlug(deck.name || ''))},
   }`;
   }).join(',\n');
 
@@ -187,7 +191,7 @@ const BLANK_DECK = {
     { section: 'Lands (36)', cards: [] },
   ],
   included: ['99-card Commander deck', 'Pilot guide booklet', 'Synergy cheat sheet', 'Upgrade path guide', 'Storage sleeve set'],
-  featured: false, quantity: 10, stripePrice: '', ourCost: 0,
+  featured: false, quantity: 10, stripePrice: '', ourCost: 0, slug: '',
 };
 
 // ─── Small UI helpers ─────────────────────────────────────────────────────────
