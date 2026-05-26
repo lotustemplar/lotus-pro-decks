@@ -59,93 +59,62 @@ function SingleSleeveSVG() {
 }
 
 /* ── Double-sleeve SVG illustration ─────────────────────────────────────────
-   3-quarter perspective: colored BACK panel offset behind the clear FRONT panel
-   so the full solid color is unmistakably visible as the back of the sleeve.
-
-   Draw order (back → front):
-   1. Colored back panel — fully filled, offset down-left
-   2. Connecting side + bottom edges (make it look like one sleeve)
-   3. Clear front panel with inner sleeve + card visible through it
+   Shows the BACK of the sleeved deck — fully opaque in the chosen color.
+   The card design is completely hidden. Only the top of the card peeks out
+   of the open end of the sleeve to show a card is inside.
+   This makes it crystal clear: the buyer sees solid color, not the card back.
 */
-function DoubleSleeveSVG({ color = '#1a1a2e' }) {
-  // Offset amount for the 3D perspective shift
-  const dx = 14, dy = 14;
-  // Back panel coords
-  const bx = 6, by = 6, bw = 126, bh = 188;
-  // Front panel coords (shifted dx right, dy up)
-  const fx = bx + dx, fy = by - dy, fw = bw, fh = bh;
-
+function DoubleSleeveSVG({ color = '#0e0e0e' }) {
   return (
-    <svg viewBox="0 0 170 222" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-xl">
+    <svg viewBox="0 0 160 222" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-xl">
 
-      {/* ── 1. BACK panel — fully solid color ── */}
-      <rect x={bx} y={by} width={bw} height={bh} rx="9" fill={color} />
-      {/* Subtle gloss on back panel */}
-      <rect x={bx} y={by} width={bw * 0.35} height={bh} rx="9"
-        fill="rgba(255,255,255,0.07)" />
-      {/* Back panel border */}
-      <rect x={bx} y={by} width={bw} height={bh} rx="9"
-        fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      {/* ── Drop shadow beneath sleeve ── */}
+      <ellipse cx="80" cy="212" rx="52" ry="6" fill="rgba(0,0,0,0.35)" />
 
-      {/* ── 2. Connecting edges (side faces of the sleeve) ── */}
-      {/* Top face */}
-      <polygon
-        points={`${bx},${by} ${bx+bw},${by} ${fx+fw},${fy} ${fx},${fy}`}
-        fill={color} opacity="0.55"
-        stroke="rgba(255,255,255,0.12)" strokeWidth="0.8"
-      />
-      {/* Right face */}
-      <polygon
-        points={`${bx+bw},${by} ${bx+bw},${by+bh} ${fx+fw},${fy+fh} ${fx+fw},${fy}`}
-        fill={color} opacity="0.4"
-        stroke="rgba(255,255,255,0.10)" strokeWidth="0.8"
-      />
-      {/* Bottom face */}
-      <polygon
-        points={`${bx},${by+bh} ${bx+bw},${by+bh} ${fx+fw},${fy+fh} ${fx},${fy+fh}`}
-        fill={color} opacity="0.3"
-        stroke="rgba(255,255,255,0.10)" strokeWidth="0.8"
-      />
+      {/* ── Outer sleeve — opaque colored back (this is what the buyer sees) ── */}
+      <rect x="15" y="18" width="130" height="190" rx="10" fill={color} />
 
-      {/* ── 3. FRONT panel — clear outer sleeve ── */}
-      <rect x={fx} y={fy} width={fw} height={fh} rx="9"
-        fill="rgba(180,220,255,0.07)" stroke="rgba(180,220,255,0.45)" strokeWidth="1.5" />
-      {/* Front gloss strip */}
-      <rect x={fx} y={fy} width={fw * 0.30} height={fh} rx="9"
-        fill="rgba(255,255,255,0.04)" />
-      {/* Open top edge */}
-      <line x1={fx} y1={fy} x2={fx+fw} y2={fy}
-        stroke="rgba(200,240,255,0.55)" strokeWidth="1" />
+      {/* Subtle inner shadow at edges to give physical depth */}
+      <rect x="15" y="18" width="130" height="190" rx="10"
+        fill="none" stroke="rgba(0,0,0,0.4)" strokeWidth="6" />
 
-      {/* ── Inner clear sleeve (inside front panel) ── */}
-      <rect x={fx+4} y={fy+3} width={fw-8} height={fh-6} rx="7"
-        fill="rgba(180,220,255,0.04)" stroke="rgba(180,220,255,0.28)" strokeWidth="1" />
+      {/* Gloss sheen — left strip */}
+      <rect x="15" y="18" width="42" height="190" rx="10"
+        fill="rgba(255,255,255,0.09)" />
+      {/* Gloss sheen — top highlight arc */}
+      <ellipse cx="80" cy="24" rx="42" ry="7"
+        fill="rgba(255,255,255,0.08)" />
 
-      {/* ── Card back ── */}
-      <rect x={fx+7} y={fy+5} width={fw-14} height={fh-10} rx="6" fill="#14213d" />
-      <rect x={fx+11} y={fy+9} width={fw-22} height={fh-18} rx="4"
-        fill="none" stroke="#1e3a6e" strokeWidth="1.1" />
-      <rect x={fx+16} y={fy+14} width={fw-32} height={fh-28} rx="3"
-        fill="none" stroke="#1a3060" strokeWidth="0.7" />
-      {/* Diamond */}
-      <path d={`M${fx+fw/2} ${fy+28} L${fx+fw-20} ${fy+fh/2} L${fx+fw/2} ${fy+fh-28} L${fx+20} ${fy+fh/2} Z`}
-        fill="none" stroke="#1e3a6e" strokeWidth="1.1" />
-      {/* Center circle */}
-      <circle cx={fx+fw/2} cy={fy+fh/2} r="18"
-        fill="none" stroke="#1e3a6e" strokeWidth="1.1" />
-      {/* Corner pips */}
-      {[
-        [fx+13, fy+13],
-        [fx+fw-13, fy+13],
-        [fx+13, fy+fh-13],
-        [fx+fw-13, fy+fh-13],
-      ].map(([cx,cy],i) => (
-        <circle key={i} cx={cx} cy={cy} r="2.5" fill="none" stroke="#1e3a6e" strokeWidth="0.8" />
-      ))}
+      {/* Sleeve border */}
+      <rect x="15" y="18" width="130" height="190" rx="10"
+        fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth="1.5" />
 
-      {/* ── Labels ── */}
-      <text x="85" y="213" textAnchor="middle"
-        fill="rgba(200,220,255,0.5)" fontSize="8" fontFamily="system-ui,sans-serif" letterSpacing="0.3">
+      {/* ── Open top edge of sleeve (where card was inserted) ── */}
+      <path d="M15 28 Q80 22 145 28"
+        stroke="rgba(255,255,255,0.30)" strokeWidth="1.2" fill="none" />
+
+      {/* ── Card peeking out the top (just the very top edge — no design visible) ── */}
+      {/* Inner clear sleeve tip */}
+      <rect x="22" y="5" width="116" height="26" rx="5"
+        fill="rgba(180,220,255,0.07)" stroke="rgba(180,220,255,0.35)" strokeWidth="1" />
+      {/* Card top edge — plain, no back design */}
+      <rect x="26" y="7" width="108" height="22" rx="4" fill="#1a2540" />
+      {/* Subtle card border at top */}
+      <rect x="30" y="10" width="100" height="16" rx="3"
+        fill="none" stroke="#253f7a" strokeWidth="0.8" />
+
+      {/* ── "Opaque back" badge ── */}
+      <rect x="32" y="118" width="96" height="20" rx="10"
+        fill="rgba(0,0,0,0.35)" />
+      <text x="80" y="132" textAnchor="middle"
+        fill="rgba(255,255,255,0.55)" fontSize="8.5" fontFamily="system-ui,sans-serif" letterSpacing="0.5"
+        fontWeight="600">
+        OPAQUE BACK
+      </text>
+
+      {/* ── Label ── */}
+      <text x="80" y="218" textAnchor="middle"
+        fill="rgba(200,220,255,0.45)" fontSize="8" fontFamily="system-ui,sans-serif" letterSpacing="0.3">
         Perfect Fit Inner · Premium Outer
       </text>
     </svg>
