@@ -180,18 +180,28 @@ export const playstyleMeta = [
 `;
 }
 
+const FIXED_DECKLIST_SECTIONS = [
+  'Commander',
+  'Ramp & Mana',
+  'Creatures & Synergy Engines',
+  'Interaction & Protection',
+  'Lands',
+];
+
+function normalizeDecklist(existing) {
+  return FIXED_DECKLIST_SECTIONS.map(name => {
+    const found = (existing || []).find(s => s.section === name);
+    return found ? { ...found } : { section: name, cards: [] };
+  });
+}
+
 const BLANK_DECK = {
   name: '', commander: '', price: 149, bracket: 2,
   colors: [], colorLabel: '', difficulty: 5, playstyles: [],
   description: '', image: null,
   accentColor: '#6366f1', gradientFrom: '#0a0a1a', gradientTo: '#1a0a1a', glowClass: 'glow-purple',
   strategy: '', wins: '', pilotGuide: '', openingHand: '', upgradePath: '', tokensNeeded: '',
-  fullDecklist: [
-    { section: 'Commander', cards: [] },
-    { section: 'Creatures ()', cards: [] },
-    { section: 'Artifacts ()', cards: [] },
-    { section: 'Lands (36)', cards: [] },
-  ],
+  fullDecklist: FIXED_DECKLIST_SECTIONS.map(section => ({ section, cards: [] })),
   included: ['99-card Commander deck', 'Pilot guide booklet', 'Synergy cheat sheet', 'Upgrade path guide', 'Storage sleeve set'],
   featured: false, quantity: 10, stripePrice: '', ourCost: 0, slug: '',
 };
@@ -622,7 +632,13 @@ export default function Admin() {
     setDeckList(p => [...p, ...newDecks]);
   }
   function newDeck()  { setEditing({ ...BLANK_DECK, id: Date.now() }); setActiveTab('basic'); }
-  function editDeck(d){ setEditing(JSON.parse(JSON.stringify(d)));       setActiveTab('basic'); }
+  function editDeck(d) {
+    const copy = JSON.parse(JSON.stringify(d));
+    // Always normalize to the 5 fixed sections so old data in localStorage migrates cleanly
+    copy.fullDecklist = normalizeDecklist(copy.fullDecklist);
+    setEditing(copy);
+    setActiveTab('basic');
+  }
   function deleteDeck(id) {
     if (!window.confirm('Delete this deck?')) return;
     setDeckList(p => p.filter(d => d.id !== id));
@@ -1331,30 +1347,24 @@ export default function Admin() {
             {/* Decklist tab */}
             {activeTab === 'decklist' && (
               <div className="space-y-4">
-                <p className="text-xs text-gray-500">One card per line per section.</p>
-                {editing.fullDecklist.map((section, i) => (
-                  <div key={i} className="p-4 rounded-xl bg-white/3 border border-white/8">
-                    <div className="flex items-center gap-2 mb-3">
-                      <input value={section.section} onChange={e => updateSection(i, 'section', e.target.value)}
-                        className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-sm
-                          font-medium focus:outline-none focus:border-blue-500 transition-colors" placeholder="Section name" />
-                      <button onClick={() => removeSection(i)}
-                        className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors">
-                        <Trash2 size={12} />
-                      </button>
+                <p className="text-xs text-gray-500">One card per line per section. Sections are fixed.</p>
+                {FIXED_DECKLIST_SECTIONS.map((sectionName, i) => {
+                  const section = (editing.fullDecklist || [])[i] ?? { section: sectionName, cards: [] };
+                  return (
+                    <div key={sectionName} className="p-4 rounded-xl bg-white/3 border border-white/8">
+                      <p className="text-sm font-semibold text-white mb-3">{sectionName}</p>
+                      <textarea
+                        value={section.cards.join('\n')}
+                        onChange={e => setSectionCards(i, e.target.value)}
+                        rows={Math.max(4, section.cards.length + 2)}
+                        placeholder="One card per line…"
+                        className="w-full bg-[#0a0e1a] border border-white/8 rounded-lg px-3 py-2.5 text-gray-300 text-sm
+                          font-mono leading-relaxed focus:outline-none focus:border-blue-500 resize-none transition-colors"
+                      />
+                      <div className="text-xs text-gray-600 mt-1">{section.cards.length} cards</div>
                     </div>
-                    <textarea value={section.cards.join('\n')} onChange={e => setSectionCards(i, e.target.value)}
-                      rows={Math.max(4, section.cards.length + 2)} placeholder="One card per line…"
-                      className="w-full bg-[#0a0e1a] border border-white/8 rounded-lg px-3 py-2.5 text-gray-300 text-sm
-                        font-mono leading-relaxed focus:outline-none focus:border-blue-500 resize-none transition-colors" />
-                    <div className="text-xs text-gray-600 mt-1">{section.cards.length} cards</div>
-                  </div>
-                ))}
-                <button onClick={addSection}
-                  className="w-full py-3 rounded-xl border border-dashed border-white/15 text-gray-500
-                    hover:text-gray-300 hover:border-white/30 text-sm transition-colors flex items-center justify-center gap-2">
-                  <Plus size={14} /> Add Section
-                </button>
+                  );
+                })}
               </div>
             )}
           </div>
