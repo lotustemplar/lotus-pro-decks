@@ -134,14 +134,10 @@ export const decks = [
     tokensNeeded: "Clue (artifact token), Spirit (1/1 white flying), Food (artifact token), Treasure (artifact token), Human Soldier (1/1 white), Soldier (1/1 white), Zombie (2/2 black), Snake (1/1 black deathtouch), Eldrazi Spawn (0/1 colorless), Servo (1/1 colorless artifact), Skeleton (1/1 black)",
     fullDecklist: [
       { section: "Commander", cards: ["Teysa, Opulent Oligarch"] },
-      { section: "Mana & Ramp (8)", cards: ["Sol Ring","Arcane Signet","Orzhov Signet","Talisman of Hierarchy","Mind Stone","Wayfarer's Bauble","Burnished Hart","Solemn Simulacrum"] },
-      { section: "Clue & Token Makers (10)", cards: ["Novice Inspector","Thraben Inspector","Vitu-Ghazi Inspector","Detective's Satchel","Case of the Stashed Skeleton","Lingering Souls","Ministrant of Obligation","Resolute Reinforcements","Ophiomancer","Jadar, Ghoulcaller of Nephalia"] },
-      { section: "Sacrifice Outlets (7)", cards: ["Viscera Seer","Yahenni, Undying Partisan","Woe Strider","Bloodthrone Vampire","Reassembling Skeleton","Pawn of Ulamog","Weaponcraft Enthusiast"] },
-      { section: "Drain Payoffs (12)", cards: ["Blood Artist","Zulaport Cutthroat","Bastion of Remembrance","Falkenrath Noble","Vindictive Vampire","Lampad of Death's Vigil","Marionette Apprentice","Nadier's Nightblade","Bishop of the Bloodstained","Indulgent Aristocrat","Elenda, Saint of Dusk","Kaya, Geist Hunter"] },
-      { section: "Card Draw & Recursion (9)", cards: ["Morbid Opportunist","Plumb the Forbidden","Corrupted Conviction","Eviscerator's Insight","Read the Bones","Phyrexian Arena","Phyrexian Reclamation","Victimize","Raise the Past"] },
-      { section: "Removal (11)", cards: ["Swords to Plowshares","Path to Exile","Anguished Unmaking","Mortify","Vanishing Verse","Utter End","Fracture","Feed the Swarm","Go for the Throat","Infernal Grasp","Austere Command"] },
-      { section: "Utility (6)", cards: ["Academy Manufactor","Intangible Virtue","Kaya, Spirits' Justice","Elspeth, Sun's Champion","Selfless Spirit","Dawnbringer Cleric"] },
-      { section: "Lands (36)", cards: ["Command Tower","Orzhov Basilica","Temple of Silence","Scoured Barrens","Isolated Chapel","Caves of Koilos","Tainted Field","Orzhov Guildgate","Bojuka Bog","Myriad Landscape","Evolving Wilds","Terramorphic Expanse","Path of Ancestry","Temple of the False God","Thriving Heath","Thriving Moor","Plains x10","Swamp x10"] }
+      { section: "Ramp & Mana", cards: [] },
+      { section: "Creatures & Synergy Engines", cards: [] },
+      { section: "Interaction & Protection", cards: [] },
+      { section: "Lands", cards: [] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Clue token pack", "Aristocrat trigger reference", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
