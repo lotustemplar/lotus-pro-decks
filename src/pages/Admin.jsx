@@ -114,9 +114,9 @@ async function uploadToGitHub(file, token) {
   return filename;
 }
 
-async function pushDecksJs(deckList, token) {
+async function pushDecksJs(deckList, token, message = 'Update decks via admin panel') {
   const content = btoa(unescape(encodeURIComponent(generateDecksJs(deckList))));
-  await ghPut('src/data/decks.js', content, 'Update decks via admin panel', token);
+  await ghPut('src/data/decks.js', content, message, token);
 }
 
 // ─── Generate decks.js content ────────────────────────────────────────────────
@@ -598,6 +598,9 @@ export default function Admin() {
   // push status: 'idle' | 'pushing' | 'done' | 'error'
   const [pushStatus,    setPushStatus]    = useState('idle');
   const [pushError,     setPushError]     = useState('');
+  // bulk-push (Push All Decks button)
+  const [bulkPushStatus, setBulkPushStatus] = useState('idle'); // 'idle' | 'pushing' | 'done' | 'error'
+  const [bulkPushError,  setBulkPushError]  = useState('');
   const [marginPct,     setMarginPct]     = useState(40);
   const [orderDirty,    setOrderDirty]    = useState(false);
   const [orderPushing,  setOrderPushing]  = useState(false);
@@ -691,6 +694,30 @@ export default function Admin() {
       setDeletePushErr(err.message);
     } finally {
       setDeletePushing(false);
+    }
+  }
+
+  async function pushAllDecks() {
+    if (!ghToken) {
+      alert('Connect a GitHub token first (click the GitHub button in the top bar).');
+      return;
+    }
+    setBulkPushStatus('pushing');
+    setBulkPushError('');
+    try {
+      // Normalize every deck's fullDecklist to the 5 fixed sections before pushing
+      // This repairs any stale localStorage data without touching text fields
+      const normalized = deckList.map(d => ({
+        ...d,
+        fullDecklist: normalizeDecklist(d.fullDecklist),
+      }));
+      setDeckList(normalized); // update localStorage too so it stays clean
+      await pushDecksJs(normalized, ghToken, 'Sync all decks — normalize sections via admin panel');
+      setBulkPushStatus('done');
+      setTimeout(() => setBulkPushStatus('idle'), 6000);
+    } catch (err) {
+      setBulkPushError(err.message);
+      setBulkPushStatus('error');
     }
   }
 
@@ -841,6 +868,19 @@ export default function Admin() {
               <Download size={14} />
               <span className="hidden sm:inline">{exportFlash ? 'Downloaded!' : 'Download decks.js'}</span>
             </button>
+            <button
+              onClick={pushAllDecks}
+              disabled={bulkPushStatus === 'pushing'}
+              title="Normalize all deck sections and push entire decks.js to GitHub in one commit"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500
+                text-white text-sm font-semibold transition-colors disabled:opacity-50">
+              {bulkPushStatus === 'pushing'
+                ? <><Loader2 size={14} className="animate-spin" /> Pushing…</>
+                : bulkPushStatus === 'done'
+                  ? <><Check size={14} /> All Live!</>
+                  : <><Upload size={14} /><span className="hidden sm:inline"> Push All Decks</span></>
+              }
+            </button>
             <button onClick={newDeck}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500
                 text-white text-sm font-semibold transition-colors">
@@ -868,6 +908,25 @@ export default function Admin() {
               <button onClick={() => setShowGhSettings(true)} className="underline font-medium">Connect a GitHub token</button>{' '}
               to publish changes automatically. Without it, use <em>Download decks.js</em> to deploy manually.
             </span>
+          </div>
+        )}
+
+        {/* Bulk-push feedback banner */}
+        {(bulkPushStatus === 'done' || bulkPushStatus === 'error') && (
+          <div className={`mb-4 p-3 rounded-xl border text-sm flex items-center justify-between gap-3 ${
+            bulkPushStatus === 'done'
+              ? 'bg-green-500/8 border-green-500/20 text-green-400'
+              : 'bg-red-500/8 border-red-500/20 text-red-400'
+          }`}>
+            <div className="flex items-center gap-2">
+              {bulkPushStatus === 'done'
+                ? <><Check size={14} className="shrink-0" /> All decks pushed — sections normalized &amp; site is rebuilding.</>
+                : <><span className="shrink-0">✗</span> Push failed: {bulkPushError}</>
+              }
+            </div>
+            <button onClick={() => setBulkPushStatus('idle')} className="text-gray-500 hover:text-white transition-colors shrink-0">
+              <X size={13} />
+            </button>
           </div>
         )}
 
