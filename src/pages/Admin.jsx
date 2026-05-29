@@ -582,12 +582,33 @@ export default function Admin() {
       const saved = localStorage.getItem('adminDecks');
       if (!saved) return initialDecks.map(d => ({ ...d, quantity: d.quantity ?? 10 }));
       const parsed = JSON.parse(saved);
-      // Auto-merge any decks added to decks.js that aren't in localStorage yet
+
+      // Build a lookup of source decklists so we can repair stale localStorage
+      const sourceById = Object.fromEntries(initialDecks.map(d => [d.id, d]));
+
+      // For each deck in localStorage, restore fullDecklist from source if:
+      //   (a) all sections are empty — stale admin push wiped the cards, OR
+      //   (b) none of the section names match our 5 fixed names — old format
+      const fixed = FIXED_DECKLIST_SECTIONS;
+      const merged = parsed.map(d => {
+        const src = sourceById[d.id];
+        if (!src) return d; // custom deck not in source — keep as-is
+        const dl = d.fullDecklist || [];
+        const hasCards   = dl.some(s => s.cards && s.cards.length > 0);
+        const hasFixedNames = dl.some(s => fixed.includes(s.section));
+        if (!hasCards || !hasFixedNames) {
+          // Restore from source; preserve admin-only fields (price, qty, stripePrice…)
+          return { ...d, fullDecklist: src.fullDecklist };
+        }
+        return d;
+      });
+
+      // Also add any brand-new decks from source not yet in localStorage
       const existingIds = new Set(parsed.map(d => d.id));
       const newDecks = initialDecks
         .filter(d => !existingIds.has(d.id))
         .map(d => ({ ...d, quantity: d.quantity ?? 10 }));
-      return newDecks.length ? [...parsed, ...newDecks] : parsed;
+      return newDecks.length ? [...merged, ...newDecks] : merged;
     } catch { return initialDecks.map(d => ({ ...d, quantity: d.quantity ?? 10 })); }
   });
 
@@ -628,11 +649,23 @@ export default function Admin() {
 
   // ── List helpers ─────────────────────────────────────────────────────────────
   function syncFromSource() {
-    // Add any decks from initialDecks that aren't in deckList yet (by id)
+    const sourceById = Object.fromEntries(initialDecks.map(d => [d.id, d]));
     const existingIds = new Set(deckList.map(d => d.id));
-    const newDecks = initialDecks.filter(d => !existingIds.has(d.id)).map(d => ({ ...d, quantity: d.quantity ?? 10 }));
-    if (!newDecks.length) { alert('Already up to date — no new decks found in source.'); return; }
-    setDeckList(p => [...p, ...newDecks]);
+
+    // Refresh fullDecklist for every existing deck from source
+    const refreshed = deckList.map(d => {
+      const src = sourceById[d.id];
+      if (!src) return d;
+      return { ...d, fullDecklist: src.fullDecklist };
+    });
+
+    // Add brand-new decks from source
+    const newDecks = initialDecks
+      .filter(d => !existingIds.has(d.id))
+      .map(d => ({ ...d, quantity: d.quantity ?? 10 }));
+
+    setDeckList(newDecks.length ? [...refreshed, ...newDecks] : refreshed);
+    alert(`Decklists refreshed from source${newDecks.length ? ` and ${newDecks.length} new deck(s) added` : ''}.`);
   }
   function newDeck()  { setEditing({ ...BLANK_DECK, id: Date.now() }); setActiveTab('basic'); }
   function editDeck(d) {
