@@ -97,13 +97,10 @@ export const decks = [
     tokensNeeded: "Goblin (1/1 red), Goblin Wizard (1/1 red with flying), Treasure (artifact), Storm counter helper for Empty the Warrens",
     fullDecklist: [
       { section: "Commander", cards: ["Krenko, Mob Boss"] },
-      { section: "Mana & Support (12)", cards: ["Sol Ring","Arcane Signet","Mind Stone","Prismatic Lens","Heraldic Banner","Worn Powerstone","Wayfarer's Bauble","Lightning Greaves","Lavaspur Boots","Crashing Drawbridge","Anger","Goldvein Pick"] },
-      { section: "Goblins (22)", cards: ["Krenko, Baron of Tin Street","Goblin Warchief","Goblin Chieftain","Skirk Prospector","Goblin Matron","Battle Cry Goblin","Goblin Instigator","Mogg War Marshal","Beetleback Chief","Siege-Gang Commander","Sling-Gang Lieutenant","Squee, Goblin Nabob","Goblin Cratermaker","Frenzied Goblin","Goblin Fireslinger","Swarming Goblins","Mogg Raider","Mogg Mob","Legion Warboss","Searslicer Goblin","Goblin Dark-Dwellers","Fanatical Firebrand"] },
-      { section: "Token Makers (7)", cards: ["Dragon Fodder","Krenko's Command","Hordeling Outburst","Goblin Wizardry","Goblin Negotiation","Goblin Surprise","Empty the Warrens"] },
-      { section: "Damage Engines (8)", cards: ["Molten Gatekeeper","Impact Tremors","Goblin Bombardment","Raid Bombardment","Guttersnipe","Rankle and Torbran","Firebrand Archer","Chandra's Ignition"] },
-      { section: "Card Draw (8)", cards: ["Cathartic Reunion","Thrill of Possibility","Demand Answers","Highway Robbery","Light Up the Stage","Seize the Spoils","Return the Favor","Laelia, the Blade Reforged"] },
-      { section: "Removal (6)", cards: ["Abrade","Vandalblast","Blasphemous Act","Chain Reaction","Chaos Warp","Cathartic Pyre"] },
-      { section: "Lands (36)", cards: ["Path of Ancestry","Unclaimed Territory","Secluded Courtyard","Temple of the False God","Myriad Landscape","Forgotten Cave","Evolving Wilds","Terramorphic Expanse","Thriving Bluff","Mountain x27"] }
+      { section: "Ramp & Mana", cards: [] },
+      { section: "Creatures & Synergy Engines", cards: [] },
+      { section: "Interaction & Protection", cards: [] },
+      { section: "Lands", cards: [] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Goblin reference card", "Synergy cheat sheet", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
