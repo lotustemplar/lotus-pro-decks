@@ -171,14 +171,10 @@ export const decks = [
     tokensNeeded: "4/4 green Beast, 2/2 green Elemental, 1/1 green Insect, 1/1 green Saproling, 1/1 green Squirrel, 1/1 green Insect (flying, deathtouch), Food (artifact), Treasure (artifact)",
     fullDecklist: [
       { section: "Commander", cards: ["Tatyova, Benthic Druid"] },
-      { section: "Mana Rocks & Ramp Spells (14)", cards: ["Sol Ring","Arcane Signet","Simic Signet","Mind Stone","Thought Vessel","Growth Spiral","Explore","Rampant Growth","Farseek","Cultivate","Kodama's Reach","Harrow","Roiling Regrowth","Grow from the Ashes"] },
-      { section: "Ramp Creatures (8)", cards: ["Sakura-Tribe Elder","Coiling Oracle","Farhaven Elf","Springbloom Druid","Elvish Rejuvenator","Yavimaya Elder","Solemn Simulacrum","Roil Cartographer"] },
-      { section: "Land Tutors & Utility (5)", cards: ["Map the Frontier","Eureka Moment","Open the Way","They Went This Way","Sylvan Scrying"] },
-      { section: "Landfall Payoffs (16)", cards: ["Tireless Tracker","Tireless Provisioner","Grazing Gladehart","Retreat to Kazandu","Sporemound","Zendikar's Roil","Rampaging Baloths","Scute Swarm","Multani, Yavimaya's Avatar","Hydroid Krasis","Deep Forest Hermit","Hornet Queen","Overrun","Nissa, Steward of Elements","Nissa, Ascended Animist","Case of the Locked Hothouse"] },
-      { section: "Card Draw & Value (4)", cards: ["Harmonize","Fact or Fiction","Elemental Bond","Garruk's Packleader"] },
-      { section: "Removal & Interaction (11)", cards: ["Reclamation Sage","Acidic Slime","Reality Shift","Rapid Hybridization","Aetherize","Pongify","Arcane Denial","Beast Within","Essence Scatter","Pick Your Poison","Broken Wings"] },
-      { section: "Protection (3)", cards: ["Snakeskin Veil","Shore Up","Commit // Memory"] },
-      { section: "Lands (38)", cards: ["Command Tower","Simic Growth Chamber","Temple of Mystery","Thornwood Falls","Hinterland Harbor","Yavimaya Coast","Dreamroot Cascade","Vineglimmer Snarl","Overflowing Basin","Evolving Wilds","Terramorphic Expanse","Myriad Landscape","Ash Barrens","Tranquil Landscape","Thriving Isle","Thriving Grove","Escape Tunnel","Tranquil Thicket","Lonely Sandbar","Forest x11","Island x8"] }
+      { section: "Ramp & Mana", cards: [] },
+      { section: "Creatures & Synergy Engines", cards: [] },
+      { section: "Interaction & Protection", cards: [] },
+      { section: "Lands", cards: [] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Landfall trigger reference", "Token pack (Beast, Elemental, Insect, Squirrel, Saproling, Food, Treasure)", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
