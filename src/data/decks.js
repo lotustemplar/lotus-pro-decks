@@ -23,10 +23,10 @@ export const decks = [
     tokensNeeded: "Eldrazi Spawn (0/1 colorless, sacrifice for 1 mana), Eldrazi Scion (1/1 colorless, sacrifice for 1 mana), 10/10 colorless Eldrazi, Copy token, Experience counter helper card, +1/+1 counter helper card",
     fullDecklist: [
       { section: "Commander", cards: ["Ulalek, Fused Atrocity"] },
-      { section: "Ramp & Mana", cards: ["Arcane Signet","Conduit of Ruin","Everflowing Chalice","Forsaken Monument","From Beyond","Hedron Archive","Herald's Horn","It That Heralds the End","Sol Ring","Sowing Mycospawn","Talisman of Curiosity","Talisman of Dominance","Talisman of Impulse","Talisman of Resilience","Urza's Incubator"] },
-      { section: "Creatures & Synergy Engines", cards: ["Artisan of Kozilek","Azlask, the Swelling Scourge","Basking Broodscale","Benthic Anomaly","Bismuth Mindrender","Breaker of Creation","Chittering Dispatcher","Devourer of Destiny","Drowner of Truth","Echoes of Eternity","Eldrazi Conscription","Eldrazi Displacer","Eldrazi Linebreaker","Eldrazi Monument","Eldrazi Repurposer","Emrakul, the World Anew","Endbringer","Garruk's Uprising","Glaring Fleshraker","Inversion Behemoth","It That Betrays","Kozilek's Command","Kozilek's Unsealing","Kozilek, the Broken Reality","Matter Reshaper","Mystic Forge","Nulldrifter","Oblivion Sower","Reality Smasher","Skittering Invasion","Snapping Voidcraw","Spawnbed Protector","Thought-Knot Seer","Ugin's Binding","Ulamog's Dreadsire","Ulamog, the Defiler","Wastescape Battlemage","World Breaker","Writhing Chrysalis"] },
-      { section: "Interaction & Protection", cards: ["All Is Dust","Ancient Stirrings","Beast Within","Eldrazi Confluence","Eldritch Immunity","Not of This World","Titan's Presence","Warping Wail"] },
-      { section: "Lands", cards: ["Adarkar Wastes","Ash Barrens","Battlefield Forge","Bonders' Enclave","Brushland","Cascading Cataracts","Caves of Koilos","Command Tower","Corrupted Crossroads","Eldrazi Temple","Exotic Orchard","Karplusan Forest","Llanowar Wastes","Opal Palace","Path of Ancestry","Reliquary Tower","Ruins of Oran-Rief","Secluded Courtyard","Shivan Reef","Shrine of the Forsaken Gods","Spawning Bed","Sulfurous Springs","Tendo Ice Bridge","Tomb of the Spirit Dragon","Tranquil Landscape","Twisted Landscape","Ugin's Labyrinth","Unclaimed Territory","Underground River","Urza's Cave","Wastes x6","Yavimaya Coast"] }
+      { section: "Ramp & Mana", cards: [] },
+      { section: "Creatures & Synergy Engines", cards: [] },
+      { section: "Interaction & Protection", cards: [] },
+      { section: "Lands", cards: [] }
     ],
     included: ["100-card Commander deck", "Pilot guide booklet", "Eldrazi token pack", "Counter tracker set", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
@@ -60,10 +60,10 @@ export const decks = [
     tokensNeeded: "Saproling (1/1 green), Insect (1/1), Spider (1/2 green reach), Human Soldier (1/1 white), Goat (0/1 white), Zombie (2/2 black)",
     fullDecklist: [
       { section: "Commander", cards: ["Meren of Clan Nel Toth"] },
-      { section: "Ramp & Mana", cards: ["Arcane Signet","Elvish Mystic","Farhaven Elf","Golgari Signet","Llanowar Elves","Millikin","Sakura-Tribe Elder","Skull Prophet","Sol Ring","Wood Elves","Yavimaya Elder"] },
-      { section: "Creatures & Synergy Engines", cards: ["Bastion of Remembrance","Blood Artist","Bloodthrone Vampire","Buried Alive","Deathreap Ritual","Dina, Soul Steeper","Dread Return","Golgari Thug","Grapple with the Past","Grisly Salvage","Grist, Voracious Larva","Izoni, Center of the Web","Izoni, Thousand-Eyed","Liliana, Death's Majesty","Mazirek, Kraul Death Priest","Mire Triton","Moldervine Reclamation","Nyx Weaver","Phyrexian Reclamation","Reassembling Skeleton","Rune-Scarred Demon","Saproling Migration","Satyr Wayfinder","Skullwinder","Slimefoot, the Stowaway","Smothering Abomination","Spore Swarm","Stitcher's Supplier","Syr Konrad, the Grim","Undead Augur","Unearth","Victimize","Viscera Seer","Whisper, Blood Liturgist","Woe Strider","Yahenni, Undying Partisan","Zulaport Cutthroat"] },
-      { section: "Interaction & Protection", cards: ["Acidic Slime","Beast Within","Bloodchief's Thirst","Cankerbloom","Demon's Disciple","Eternal Witness","Feed the Swarm","Fleshbag Marauder","Foundation Breaker","Go for the Throat","Haywire Mite","Infernal Grasp","Mortality Spear","Putrefy","Reclamation Sage"] },
-      { section: "Lands", cards: ["Bojuka Bog","Command Tower","Drownyard Temple","Evolving Wilds","Forest x9","Golgari Guildgate","Golgari Rot Farm","Jungle Hollow","Llanowar Wastes","Myriad Landscape","Path of Ancestry","Swamp x10","Tainted Wood","Temple of Malady","Temple of the False God","Terramorphic Expanse","Thriving Grove","Thriving Moor","Woodland Cemetery"] }
+      { section: "Ramp & Mana", cards: [] },
+      { section: "Creatures & Synergy Engines", cards: [] },
+      { section: "Interaction & Protection", cards: [] },
+      { section: "Lands", cards: [] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Strategy card", "Synergy cheat sheet", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
@@ -97,10 +97,10 @@ export const decks = [
     tokensNeeded: "Goblin (1/1 red), Goblin Wizard (1/1 red with flying), Treasure (artifact), Storm counter helper for Empty the Warrens",
     fullDecklist: [
       { section: "Commander", cards: ["Krenko, Mob Boss"] },
-      { section: "Ramp & Mana", cards: ["Arcane Signet","Goldvein Pick","Heraldic Banner","Mind Stone","Prismatic Lens","Seize the Spoils","Skirk Prospector","Sol Ring","Wayfarer's Bauble","Worn Powerstone"] },
-      { section: "Creatures & Synergy Engines", cards: ["Anger","Battle Cry Goblin","Beetleback Chief","Crashing Drawbridge","Dragon Fodder","Empty the Warrens","Fanatical Firebrand","Firebrand Archer","Frenzied Goblin","Goblin Bombardment","Goblin Chieftain","Goblin Cratermaker","Goblin Dark-Dwellers","Goblin Fireslinger","Goblin Instigator","Goblin Matron","Goblin Negotiation","Goblin Surprise","Goblin Warchief","Goblin Wizardry","Guttersnipe","Hordeling Outburst","Impact Tremors","Krenko's Command","Krenko, Baron of Tin Street","Laelia, the Blade Reforged","Lavaspur Boots","Legion Warboss","Lightning Greaves","Mogg Mob","Mogg Raider","Mogg War Marshal","Molten Gatekeeper","Raid Bombardment","Rankle and Torbran","Searslicer Goblin","Siege-Gang Commander","Sling-Gang Lieutenant","Squee, Goblin Nabob","Swarming Goblins"] },
-      { section: "Interaction & Protection", cards: ["Abrade","Blasphemous Act","Cathartic Pyre","Cathartic Reunion","Chain Reaction","Chandra's Ignition","Chaos Warp","Demand Answers","Highway Robbery","Light Up the Stage","Return the Favor","Thrill of Possibility","Vandalblast"] },
-      { section: "Lands", cards: ["Evolving Wilds","Forgotten Cave","Mountain x27","Myriad Landscape","Path of Ancestry","Secluded Courtyard","Temple of the False God","Terramorphic Expanse","Thriving Bluff","Unclaimed Territory"] }
+      { section: "Ramp & Mana", cards: [] },
+      { section: "Creatures & Synergy Engines", cards: [] },
+      { section: "Interaction & Protection", cards: [] },
+      { section: "Lands", cards: [] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Goblin reference card", "Synergy cheat sheet", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
@@ -134,10 +134,10 @@ export const decks = [
     tokensNeeded: "Clue (artifact token), Spirit (1/1 white flying), Food (artifact token), Treasure (artifact token), Human Soldier (1/1 white), Soldier (1/1 white), Zombie (2/2 black), Snake (1/1 black deathtouch), Eldrazi Spawn (0/1 colorless), Servo (1/1 colorless artifact), Skeleton (1/1 black)",
     fullDecklist: [
       { section: "Commander", cards: ["Teysa, Opulent Oligarch"] },
-      { section: "Ramp & Mana", cards: ["Arcane Signet","Burnished Hart","Mind Stone","Orzhov Signet","Sol Ring","Solemn Simulacrum","Talisman of Hierarchy","Wayfarer's Bauble"] },
-      { section: "Creatures & Synergy Engines", cards: ["Academy Manufactor","Bastion of Remembrance","Bishop of the Bloodstained","Blood Artist","Bloodthrone Vampire","Case of the Stashed Skeleton","Corrupted Conviction","Detective's Satchel","Elenda, Saint of Dusk","Elspeth, Sun's Champion","Eviscerator's Insight","Falkenrath Noble","Indulgent Aristocrat","Intangible Virtue","Jadar, Ghoulcaller of Nephalia","Kaya, Geist Hunter","Kaya, Spirits' Justice","Lampad of Death's Vigil","Lingering Souls","Marionette Apprentice","Ministrant of Obligation","Morbid Opportunist","Nadier's Nightblade","Novice Inspector","Ophiomancer","Pawn of Ulamog","Phyrexian Arena","Phyrexian Reclamation","Plumb the Forbidden","Raise the Past","Reassembling Skeleton","Resolute Reinforcements","Selfless Spirit","Thraben Inspector","Victimize","Vindictive Vampire","Viscera Seer","Vitu-Ghazi Inspector","Weaponcraft Enthusiast","Woe Strider","Yahenni, Undying Partisan","Zulaport Cutthroat"] },
-      { section: "Interaction & Protection", cards: ["Anguished Unmaking","Austere Command","Dawnbringer Cleric","Feed the Swarm","Fracture","Go for the Throat","Infernal Grasp","Mortify","Path to Exile","Read the Bones","Swords to Plowshares","Utter End","Vanishing Verse"] },
-      { section: "Lands", cards: ["Bojuka Bog","Caves of Koilos","Command Tower","Evolving Wilds","Isolated Chapel","Myriad Landscape","Orzhov Basilica","Orzhov Guildgate","Path of Ancestry","Plains x10","Scoured Barrens","Swamp x10","Tainted Field","Temple of Silence","Temple of the False God","Terramorphic Expanse","Thriving Heath","Thriving Moor"] }
+      { section: "Ramp & Mana", cards: [] },
+      { section: "Creatures & Synergy Engines", cards: [] },
+      { section: "Interaction & Protection", cards: [] },
+      { section: "Lands", cards: [] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Clue token pack", "Aristocrat trigger reference", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
@@ -171,10 +171,10 @@ export const decks = [
     tokensNeeded: "4/4 green Beast, 2/2 green Elemental, 1/1 green Insect, 1/1 green Saproling, 1/1 green Squirrel, 1/1 green Insect (flying, deathtouch), Food (artifact), Treasure (artifact)",
     fullDecklist: [
       { section: "Commander", cards: ["Tatyova, Benthic Druid"] },
-      { section: "Ramp & Mana", cards: ["Arcane Signet","Coiling Oracle","Cultivate","Elvish Rejuvenator","Eureka Moment","Explore","Farhaven Elf","Farseek","Grow from the Ashes","Growth Spiral","Harrow","Kodama's Reach","Map the Frontier","Mind Stone","Open the Way","Rampant Growth","Roil Cartographer","Roiling Regrowth","Sakura-Tribe Elder","Simic Signet","Sol Ring","Solemn Simulacrum","Springbloom Druid","Sylvan Scrying","They Went This Way","Thought Vessel","Tireless Provisioner","Yavimaya Elder"] },
-      { section: "Creatures & Synergy Engines", cards: ["Case of the Locked Hothouse","Deep Forest Hermit","Elemental Bond","Garruk's Packleader","Grazing Gladehart","Hornet Queen","Hydroid Krasis","Multani, Yavimaya's Avatar","Nissa, Ascended Animist","Nissa, Steward of Elements","Overrun","Rampaging Baloths","Retreat to Kazandu","Scute Swarm","Sporemound","Tireless Tracker","Zendikar's Roil"] },
-      { section: "Interaction & Protection", cards: ["Acidic Slime","Aetherize","Arcane Denial","Beast Within","Broken Wings","Commit // Memory","Essence Scatter","Fact or Fiction","Harmonize","Pick Your Poison","Pongify","Rapid Hybridization","Reality Shift","Reclamation Sage","Shore Up","Snakeskin Veil"] },
-      { section: "Lands", cards: ["Ash Barrens","Command Tower","Dreamroot Cascade","Escape Tunnel","Evolving Wilds","Forest x11","Hinterland Harbor","Island x8","Lonely Sandbar","Myriad Landscape","Overflowing Basin","Simic Growth Chamber","Temple of Mystery","Terramorphic Expanse","Thornwood Falls","Thriving Grove","Thriving Isle","Tranquil Landscape","Tranquil Thicket","Vineglimmer Snarl","Yavimaya Coast"] }
+      { section: "Ramp & Mana", cards: [] },
+      { section: "Creatures & Synergy Engines", cards: [] },
+      { section: "Interaction & Protection", cards: [] },
+      { section: "Lands", cards: [] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Landfall trigger reference", "Token pack (Beast, Elemental, Insect, Squirrel, Saproling, Food, Treasure)", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
