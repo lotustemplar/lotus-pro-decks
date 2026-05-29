@@ -60,16 +60,10 @@ export const decks = [
     tokensNeeded: "Saproling (1/1 green), Insect (1/1), Spider (1/2 green reach), Human Soldier (1/1 white), Goat (0/1 white), Zombie (2/2 black)",
     fullDecklist: [
       { section: "Commander", cards: ["Meren of Clan Nel Toth"] },
-      { section: "Mana & Ramp (10)", cards: ["Sol Ring","Arcane Signet","Golgari Signet","Llanowar Elves","Elvish Mystic","Sakura-Tribe Elder","Farhaven Elf","Wood Elves","Skull Prophet","Millikin"] },
-      { section: "Self-Mill & Graveyard Fill (8)", cards: ["Stitcher's Supplier","Satyr Wayfinder","Grisly Salvage","Nyx Weaver","Mire Triton","Golgari Thug","Grapple with the Past","Buried Alive"] },
-      { section: "Sacrifice Outlets (5)", cards: ["Viscera Seer","Yahenni, Undying Partisan","Woe Strider","Bloodthrone Vampire","Whisper, Blood Liturgist"] },
-      { section: "Recursion (5)", cards: ["Reassembling Skeleton","Phyrexian Reclamation","Unearth","Victimize","Dread Return"] },
-      { section: "Drain Payoffs (5)", cards: ["Blood Artist","Zulaport Cutthroat","Bastion of Remembrance","Syr Konrad, the Grim","Dina, Soul Steeper"] },
-      { section: "Value Engines (6)", cards: ["Moldervine Reclamation","Deathreap Ritual","Mazirek, Kraul Death Priest","Izoni, Thousand-Eyed","Izoni, Center of the Web","Slimefoot, the Stowaway"] },
-      { section: "Token Makers (2)", cards: ["Spore Swarm","Saproling Migration"] },
-      { section: "Removal (14)", cards: ["Reclamation Sage","Foundation Breaker","Acidic Slime","Haywire Mite","Cankerbloom","Fleshbag Marauder","Demon's Disciple","Putrefy","Mortality Spear","Beast Within","Feed the Swarm","Go for the Throat","Infernal Grasp","Bloodchief's Thirst"] },
-      { section: "Finishers & Utility (8)", cards: ["Eternal Witness","Skullwinder","Yavimaya Elder","Undead Augur","Smothering Abomination","Liliana, Death's Majesty","Rune-Scarred Demon","Grist, Voracious Larva"] },
-      { section: "Lands (36)", cards: ["Command Tower","Golgari Rot Farm","Temple of Malady","Jungle Hollow","Woodland Cemetery","Tainted Wood","Llanowar Wastes","Bojuka Bog","Myriad Landscape","Evolving Wilds","Terramorphic Expanse","Path of Ancestry","Golgari Guildgate","Temple of the False God","Drownyard Temple","Thriving Grove","Thriving Moor","Swamp x10","Forest x9"] }
+      { section: "Ramp & Mana", cards: [] },
+      { section: "Creatures & Synergy Engines", cards: [] },
+      { section: "Interaction & Protection", cards: [] },
+      { section: "Lands", cards: [] }
     ],
     included: ["99-card Commander deck", "Pilot guide booklet", "Strategy card", "Synergy cheat sheet", "Upgrade path guide", "Storage sleeve set"],
     featured: true,
