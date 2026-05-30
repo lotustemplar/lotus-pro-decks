@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-  const { priceId, deckName, deckPrice, sleeveOption, sleeveColor, sleevePrice } = req.body;
+  const { priceId, deckName, deckPrice, sleeveOption, sleeveColor, sleevePrice, couponCode } = req.body;
 
   if (!priceId) return res.status(400).json({ error: 'Missing priceId' });
 
@@ -26,6 +26,11 @@ export default async function handler(req, res) {
       shipping_rate: deckTotal >= 150 ? FREE_SHIPPING_RATE : STANDARD_SHIPPING_RATE,
     });
   }
+
+  // ── Coupon validation ────────────────────────────────────────────────────────
+  const VALID_COUPONS = { financialaid: { percent: 10 } };
+  const couponKey = (couponCode || '').toLowerCase().trim();
+  const couponDef = VALID_COUPONS[couponKey] ?? null;
 
   // Build line items — deck + optional sleeve add-on
   const lineItems = [{ price: priceId, quantity: 1 }];
@@ -45,6 +50,22 @@ export default async function handler(req, res) {
           images: [],
         },
         unit_amount: Math.round(Number(sleevePrice) * 100), // cents
+      },
+      quantity: 1,
+    });
+  }
+
+  // Apply coupon as a negative discount line item
+  if (couponDef) {
+    const subtotal = Number(deckPrice || 0) + Number(sleevePrice || 0);
+    const discountCents = Math.round(subtotal * (couponDef.percent / 100) * 100);
+    lineItems.push({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: `Coupon: ${(couponCode || '').toUpperCase()} (${couponDef.percent}% off)`,
+        },
+        unit_amount: -discountCents,
       },
       quantity: 1,
     });

@@ -82,6 +82,11 @@ export default function DeckDetail({ animationsEnabled }) {
   const [buyError, setBuyError]       = useState(null);
   const [showSleeve, setShowSleeve]   = useState(false);
 
+  // Coupon state
+  const [couponInput, setCouponInput]   = useState('');
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponError, setCouponError]   = useState('');
+
   // Notify Me state
   const [notifyEmail, setNotifyEmail]   = useState('');
   const [notifyState, setNotifyState]   = useState('idle'); // idle | loading | done | error
@@ -91,6 +96,29 @@ export default function DeckDetail({ animationsEnabled }) {
   const lowStock = !soldOut && deck?.quantity > 0 && deck?.quantity <= 5;
 
   if (!deck) return <Navigate to="/shop" replace />;
+
+  // ── Coupon logic ─────────────────────────────────────────────────────────────
+  const VALID_COUPONS = { financialaid: { percent: 10, label: 'FinancialAid' } };
+  const activeCoupon  = couponApplied ? VALID_COUPONS[couponInput.toLowerCase().trim()] : null;
+  const discountAmt   = activeCoupon ? Math.round(deck.price * activeCoupon.percent) / 100 : 0;
+  const finalPrice    = (deck.price - discountAmt).toFixed(2);
+
+  function applyCoupon() {
+    const key = couponInput.toLowerCase().trim();
+    if (VALID_COUPONS[key]) {
+      setCouponApplied(true);
+      setCouponError('');
+    } else {
+      setCouponError('Invalid coupon code.');
+      setCouponApplied(false);
+    }
+  }
+  function removeCoupon() {
+    setCouponApplied(false);
+    setCouponInput('');
+    setCouponError('');
+  }
+  // ─────────────────────────────────────────────────────────────────────────────
 
   const isPlaceholderPrice = !deck.stripePrice ||
     ['price_MEREN','price_ELSHA','price_KRENKO','price_RHYS',
@@ -122,6 +150,7 @@ export default function DeckDetail({ animationsEnabled }) {
           sleeveOption,
           sleeveColor,
           sleevePrice,
+          couponCode: couponApplied ? couponInput.trim() : null,
         }),
       });
       const data = await res.json();
@@ -385,10 +414,23 @@ export default function DeckDetail({ animationsEnabled }) {
               </div>
 
               {/* Price */}
-              <div className="flex items-baseline gap-2 mb-4">
-                <span className={`text-4xl font-display font-bold ${soldOut ? 'text-gray-500' : 'text-white'}`}>${deck.price}</span>
-                <span className="text-sm text-gray-500">USD</span>
-                {soldOut && <span className="ml-1 text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-full">SOLD OUT</span>}
+              <div className="flex items-baseline gap-2 mb-4 flex-wrap">
+                {activeCoupon ? (
+                  <>
+                    <span className="text-2xl font-display font-bold text-gray-500 line-through">${deck.price}</span>
+                    <span className="text-4xl font-display font-bold text-white">${finalPrice}</span>
+                    <span className="text-sm text-gray-500">USD</span>
+                    <span className="text-xs font-bold text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full">
+                      -{activeCoupon.percent}% off
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className={`text-4xl font-display font-bold ${soldOut ? 'text-gray-500' : 'text-white'}`}>${deck.price}</span>
+                    <span className="text-sm text-gray-500">USD</span>
+                    {soldOut && <span className="ml-1 text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-full">SOLD OUT</span>}
+                  </>
+                )}
               </div>
 
               {/* Badges */}
@@ -449,6 +491,45 @@ export default function DeckDetail({ animationsEnabled }) {
                 </div>
               ) : (
                 <>
+                  {/* Coupon code input */}
+                  <div className="mb-4">
+                    {couponApplied ? (
+                      <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/25">
+                        <span className="text-xs text-green-400 font-semibold">
+                          <Check size={11} className="inline mr-1" />
+                          {activeCoupon?.label} — {activeCoupon?.percent}% off applied
+                        </span>
+                        <button
+                          onClick={removeCoupon}
+                          className="text-gray-500 hover:text-white text-xs transition-colors ml-2"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={couponInput}
+                          onChange={e => { setCouponInput(e.target.value); setCouponError(''); }}
+                          onKeyDown={e => e.key === 'Enter' && applyCoupon()}
+                          placeholder="Coupon code"
+                          className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm
+                            placeholder-gray-600 focus:outline-none focus:border-purple-500 transition-colors"
+                        />
+                        <button
+                          onClick={applyCoupon}
+                          disabled={!couponInput.trim()}
+                          className="px-4 py-2 rounded-xl bg-white/8 border border-white/10 text-gray-300
+                            hover:text-white text-sm font-medium transition-colors disabled:opacity-40 shrink-0"
+                        >
+                          Apply
+                        </button>
+                      </div>
+                    )}
+                    {couponError && <p className="text-xs text-red-400 mt-1.5">{couponError}</p>}
+                  </div>
+
                   <button
                     onClick={handleBuyNow}
                     disabled={buying}
@@ -461,7 +542,7 @@ export default function DeckDetail({ animationsEnabled }) {
                   >
                     {buying
                       ? <><Loader2 size={18} className="animate-spin" /> Redirecting to checkout…</>
-                      : <><ShoppingCart size={18} /> Buy Now — ${deck.price}</>
+                      : <><ShoppingCart size={18} /> Buy Now — ${activeCoupon ? finalPrice : deck.price}</>
                     }
                   </button>
                   {buyError && <p className="text-xs text-center text-red-400 mb-3">{buyError}</p>}
