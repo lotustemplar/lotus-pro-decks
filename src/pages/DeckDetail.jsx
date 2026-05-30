@@ -3,6 +3,7 @@ import { useParams, Link, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ShoppingCart, ChevronDown, ChevronUp, Star, Loader2, Bell, Check, Lock } from 'lucide-react';
 import { decks, colorMeta } from '../data/decks';
+import { coupons as allCoupons } from '../data/coupons';
 import ElementalOverlay from '../components/ElementalOverlay';
 import DifficultyMeter from '../components/DifficultyMeter';
 import SEO from '../components/SEO';
@@ -98,7 +99,10 @@ export default function DeckDetail({ animationsEnabled }) {
   if (!deck) return <Navigate to="/shop" replace />;
 
   // ── Coupon logic ─────────────────────────────────────────────────────────────
-  const VALID_COUPONS = { financialaid: { percent: 10, label: 'FinancialAid' } };
+  // Build lookup from the shared coupons data file (same source as admin panel)
+  const VALID_COUPONS = Object.fromEntries(
+    allCoupons.filter(c => c.active).map(c => [c.code.toLowerCase(), c])
+  );
   const activeCoupon  = couponApplied ? VALID_COUPONS[couponInput.toLowerCase().trim()] : null;
   const discountAmt   = activeCoupon ? Math.round(deck.price * activeCoupon.percent) / 100 : 0;
   const finalPrice    = (deck.price - discountAmt).toFixed(2);
@@ -497,7 +501,7 @@ export default function DeckDetail({ animationsEnabled }) {
                       <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/25">
                         <span className="text-xs text-green-400 font-semibold">
                           <Check size={11} className="inline mr-1" />
-                          {activeCoupon?.label} — {activeCoupon?.percent}% off applied
+                          {activeCoupon?.code ?? couponInput.toUpperCase()} — {activeCoupon?.percent}% off applied
                         </span>
                         <button
                           onClick={removeCoupon}

@@ -1,4 +1,5 @@
 import Stripe from 'stripe';
+import { coupons as allCoupons } from '../src/data/coupons.js';
 
 export default async function handler(req, res) {
   // CORS headers so the browser can call this from the frontend
@@ -27,10 +28,9 @@ export default async function handler(req, res) {
     });
   }
 
-  // ── Coupon validation ────────────────────────────────────────────────────────
-  const VALID_COUPONS = { financialaid: { percent: 10 } };
+  // ── Coupon validation (read from shared coupons.js) ─────────────────────────
   const couponKey = (couponCode || '').toLowerCase().trim();
-  const couponDef = VALID_COUPONS[couponKey] ?? null;
+  const couponDef = allCoupons.find(c => c.active && c.code.toLowerCase() === couponKey) ?? null;
 
   // Build line items — deck + optional sleeve add-on
   const lineItems = [{ price: priceId, quantity: 1 }];

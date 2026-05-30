@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { decks as initialDecks, colorMeta, playstyleMeta } from '../data/decks';
+import { coupons as initialCoupons } from '../data/coupons';
 import {
   Plus, Trash2, Edit2, Download, X, Check,
   ChevronUp, ChevronDown, Upload, Settings, Lock, Eye, EyeOff, Github,
-  ImagePlus, Loader2, RefreshCw, ArrowUpDown
+  ImagePlus, Loader2, RefreshCw, ArrowUpDown, Tag
 } from 'lucide-react';
 
 // ─── Color / gradient presets ─────────────────────────────────────────────────
@@ -117,6 +118,19 @@ async function uploadToGitHub(file, token) {
 async function pushDecksJs(deckList, token, message = 'Update decks via admin panel') {
   const content = btoa(unescape(encodeURIComponent(generateDecksJs(deckList))));
   await ghPut('src/data/decks.js', content, message, token);
+}
+
+// ─── Generate / push coupons.js ───────────────────────────────────────────────
+function generateCouponsJs(list) {
+  const entries = list.map(c =>
+    `  { code: ${JSON.stringify(c.code)}, percent: ${c.percent}, active: ${c.active}, multiUse: ${c.multiUse}, description: ${JSON.stringify(c.description || '')} }`
+  ).join(',\n');
+  return `export const coupons = [\n${entries}\n];\n`;
+}
+
+async function pushCouponsJs(list, token) {
+  const content = btoa(unescape(encodeURIComponent(generateCouponsJs(list))));
+  await ghPut('src/data/coupons.js', content, 'Update coupons via admin panel', token);
 }
 
 // ─── Generate decks.js content ────────────────────────────────────────────────
@@ -633,7 +647,26 @@ export default function Admin() {
   const [waitlistCounts, setWaitlistCounts] = useState({}); // { [deckId]: number }
   const [restockMsg,    setRestockMsg]    = useState('');   // shown after restock send
 
-  useEffect(() => { localStorage.setItem('adminDecks', JSON.stringify(deckList)); }, [deckList]);
+  // ── Admin view: 'decks' | 'coupons' ──────────────────────────────────────────
+  const [adminView, setAdminView] = useState('decks');
+
+  // ── Coupon state ──────────────────────────────────────────────────────────────
+  const [couponList, setCouponList] = useState(() => {
+    try {
+      const saved = localStorage.getItem('adminCoupons');
+      return saved ? JSON.parse(saved) : initialCoupons;
+    } catch { return initialCoupons; }
+  });
+  const [couponPushStatus, setCouponPushStatus] = useState('idle'); // 'idle'|'pushing'|'done'|'error'
+  const [couponPushError,  setCouponPushError]  = useState('');
+  // New coupon form fields
+  const [newCode,     setNewCode]     = useState('');
+  const [newPercent,  setNewPercent]  = useState(10);
+  const [newMultiUse, setNewMultiUse] = useState(true);
+  const [newDesc,     setNewDesc]     = useState('');
+
+  useEffect(() => { localStorage.setItem('adminDecks',   JSON.stringify(deckList));   }, [deckList]);
+  useEffect(() => { localStorage.setItem('adminCoupons', JSON.stringify(couponList)); }, [couponList]);
   useEffect(() => { localStorage.setItem('admin_gh_token', ghToken); }, [ghToken]);
 
   // Fetch waitlist counts on mount (best-effort — fails silently if KV not set up)
@@ -667,6 +700,32 @@ export default function Admin() {
     setDeckList(newDecks.length ? [...refreshed, ...newDecks] : refreshed);
     alert(`Decklists refreshed from source${newDecks.length ? ` and ${newDecks.length} new deck(s) added` : ''}.`);
   }
+  // ── Coupon helpers ───────────────────────────────────────────────────────────
+  async function saveCoupons() {
+    if (!ghToken) { alert('Connect a GitHub token first.'); return; }
+    setCouponPushStatus('pushing'); setCouponPushError('');
+    try {
+      await pushCouponsJs(couponList, ghToken);
+      setCouponPushStatus('done');
+      setTimeout(() => setCouponPushStatus('idle'), 6000);
+    } catch (err) {
+      setCouponPushError(err.message);
+      setCouponPushStatus('error');
+    }
+  }
+  function addCoupon() {
+    const code = newCode.trim();
+    if (!code) return;
+    setCouponList(l => [...l, { code, percent: Number(newPercent) || 10, active: true, multiUse: newMultiUse, description: newDesc.trim() }]);
+    setNewCode(''); setNewPercent(10); setNewMultiUse(true); setNewDesc('');
+  }
+  function removeCoupon(i) {
+    if (!window.confirm(`Remove coupon "${couponList[i].code}"?`)) return;
+    setCouponList(l => l.filter((_, j) => j !== i));
+  }
+  function toggleCouponActive(i)   { setCouponList(l => l.map((c, j) => j === i ? { ...c, active:   !c.active   } : c)); }
+  function toggleCouponMultiUse(i) { setCouponList(l => l.map((c, j) => j === i ? { ...c, multiUse: !c.multiUse } : c)); }
+
   function newDeck()  { setEditing({ ...BLANK_DECK, id: Date.now() }); setActiveTab('basic'); }
   function editDeck(d) {
     const copy = JSON.parse(JSON.stringify(d));
@@ -922,6 +981,34 @@ export default function Admin() {
           </div>
         </div>
 
+        {/* ── Section tabs ─────────────────────────────────────────────────── */}
+        <div className="flex gap-1 mb-6 p-1 rounded-xl bg-white/3 border border-white/8 w-fit">
+          <button
+            onClick={() => setAdminView('decks')}
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              adminView === 'decks' ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            Decks
+            <span className="text-xs px-1.5 py-0.5 rounded-full bg-white/10 text-gray-400">{deckList.length}</span>
+          </button>
+          <button
+            onClick={() => setAdminView('coupons')}
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              adminView === 'coupons' ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <Tag size={13} /> Coupons
+            {couponList.length > 0 && (
+              <span className="text-xs px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-400">
+                {couponList.length}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {adminView === 'decks' && (<>
+
         {!ghToken && (
           <div className="mb-4 p-3 rounded-xl bg-yellow-500/8 border border-yellow-500/20 text-yellow-400 text-sm flex items-center gap-3">
             <Github size={14} className="shrink-0" />
@@ -1090,6 +1177,174 @@ export default function Admin() {
             </div>
           ))}
         </div>
+
+        </>) /* end adminView === 'decks' */}
+
+        {/* ── Coupons tab ───────────────────────────────────────────────────── */}
+        {adminView === 'coupons' && (
+          <div className="space-y-4">
+
+            {/* GitHub banner */}
+            {!ghToken && (
+              <div className="p-3 rounded-xl bg-yellow-500/8 border border-yellow-500/20 text-yellow-400 text-sm flex items-center gap-3">
+                <Github size={14} className="shrink-0" />
+                <span>Connect your <button onClick={() => setShowGhSettings(true)} className="underline font-medium">GitHub token</button> to save coupons to the live site.</span>
+              </div>
+            )}
+
+            {/* Add coupon form */}
+            <div className="p-4 rounded-2xl bg-white/3 border border-white/8">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Add New Coupon</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Code</label>
+                  <input
+                    value={newCode}
+                    onChange={e => setNewCode(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && addCoupon()}
+                    placeholder="e.g. SAVE10"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm
+                      placeholder-gray-600 focus:outline-none focus:border-purple-500 transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">% Off</label>
+                  <input
+                    type="number" min={1} max={100}
+                    value={newPercent}
+                    onChange={e => setNewPercent(Number(e.target.value))}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm
+                      focus:outline-none focus:border-purple-500 transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Usage type</label>
+                  <select
+                    value={newMultiUse ? 'multi' : 'once'}
+                    onChange={e => setNewMultiUse(e.target.value === 'multi')}
+                    className="w-full bg-[#1a1f2e] border border-white/10 rounded-xl px-3 py-2 text-white text-sm
+                      focus:outline-none focus:border-purple-500 transition-colors"
+                  >
+                    <option value="multi">Multiple use</option>
+                    <option value="once">1-time only</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Description</label>
+                  <input
+                    value={newDesc}
+                    onChange={e => setNewDesc(e.target.value)}
+                    placeholder="Optional note"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm
+                      placeholder-gray-600 focus:outline-none focus:border-purple-500 transition-colors"
+                  />
+                </div>
+              </div>
+              <button
+                onClick={addCoupon}
+                disabled={!newCode.trim()}
+                className="mt-3 flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500
+                  text-white text-sm font-semibold transition-colors disabled:opacity-40"
+              >
+                <Plus size={14} /> Add Coupon
+              </button>
+            </div>
+
+            {/* Coupon list */}
+            {couponList.length === 0 ? (
+              <div className="p-8 text-center text-gray-600 text-sm rounded-2xl bg-white/3 border border-white/8">
+                No coupons yet. Add one above.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {couponList.map((c, i) => (
+                  <div key={i}
+                    className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${
+                      c.active ? 'bg-white/3 border-white/8' : 'bg-white/1 border-white/4 opacity-50'
+                    }`}
+                  >
+                    {/* Code + badges */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-mono font-bold text-white text-sm tracking-wide">{c.code}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/20">
+                          {c.percent}% off
+                        </span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full border ${
+                          c.multiUse
+                            ? 'bg-blue-500/15 text-blue-400 border-blue-500/20'
+                            : 'bg-orange-500/15 text-orange-400 border-orange-500/20'
+                        }`}>
+                          {c.multiUse ? '∞ Multi-use' : '1× Only'}
+                        </span>
+                        {c.description && (
+                          <span className="text-xs text-gray-500 italic">{c.description}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Controls */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => toggleCouponActive(i)}
+                        title={c.active ? 'Click to disable' : 'Click to enable'}
+                        className={`text-xs px-3 py-1.5 rounded-lg border font-medium transition-colors ${
+                          c.active
+                            ? 'bg-green-500/10 border-green-500/20 text-green-400 hover:bg-green-500/20'
+                            : 'bg-white/5 border-white/10 text-gray-500 hover:text-gray-300'
+                        }`}
+                      >
+                        {c.active ? 'Active' : 'Disabled'}
+                      </button>
+                      <button
+                        onClick={() => toggleCouponMultiUse(i)}
+                        title="Toggle single / multi use"
+                        className={`text-xs px-3 py-1.5 rounded-lg border font-medium transition-colors ${
+                          c.multiUse
+                            ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 hover:bg-blue-500/20'
+                            : 'bg-orange-500/10 border-orange-500/20 text-orange-400 hover:bg-orange-500/20'
+                        }`}
+                      >
+                        {c.multiUse ? '∞ Multi' : '1× Only'}
+                      </button>
+                      <button
+                        onClick={() => removeCoupon(i)}
+                        className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Save to GitHub */}
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                onClick={saveCoupons}
+                disabled={couponPushStatus === 'pushing'}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500
+                  text-white text-sm font-semibold transition-colors disabled:opacity-50"
+              >
+                {couponPushStatus === 'pushing'
+                  ? <><Loader2 size={14} className="animate-spin" /> Pushing…</>
+                  : couponPushStatus === 'done'
+                    ? <><Check size={14} /> Coupons Live!</>
+                    : <><Upload size={14} /> Save Coupons to GitHub</>
+                }
+              </button>
+              {couponPushStatus === 'error' && (
+                <span className="text-xs text-red-400">Push failed: {couponPushError}</span>
+              )}
+              {couponPushStatus === 'done' && (
+                <span className="text-xs text-green-400">Saved — site rebuilding (~1 min).</span>
+              )}
+            </div>
+
+          </div>
+        )} {/* end adminView === 'coupons' */}
+
       </div>
     </div>
   );
